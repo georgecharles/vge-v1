@@ -1,0 +1,178 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #14141C;         /* Slightly lighter black */
+    --foreground: #FFFFFF;
+    --card: #1C1C26;
+    --card-foreground: #FFFFFF;
+    --popover: #1C1C26;
+    --popover-foreground: #FFFFFF;
+    --primary: #0A0F1C;
+    --primary-foreground: #FFFFFF;
+    --secondary: #F2F2F2;
+    --secondary-foreground: #0A0F1C;
+    --muted: #F2F2F2;
+    --muted-foreground: #71717A;
+    --accent: #F2F2F2;
+    --accent-foreground: #0A0F1C;
+    --destructive: #DC2626;
+    --destructive-foreground: #FFFFFF;
+    --border: #D1D5DB;
+    --input: #D1D5DB;
+    --ring: #FFFFFF;
+    --radius: 0.75rem;
+  }
+
+  body {
+    /* Uses the custom black.950 (from Tailwind config) for background */
+    @apply bg-black-950 text-white font-light antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    font-family: 'Glory', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Glory', sans-serif;
+    @apply font-light;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  a {
+    @apply transition-all duration-200;
+  }
+
+  button {
+    @apply transition-all duration-200;
+  }
+
+  .card {
+    @apply transition-all duration-300;
+  }
+}
+
+/* Glass morphism effects */
+.glass-panel {
+  /* Uses black.800/30 and gold.500 from the extended palette in tailwind.config.js */
+  @apply bg-black-800/30 backdrop-blur-2xl border border-gold-500/10;
+  box-shadow:
+    0 8px 32px -4px rgba(0, 0, 0, 0.2),
+    0 4px 8px -2px rgba(0, 0, 0, 0.1),
+    inset 0 2px 4px rgba(255, 255, 255, 0.05);
+}
+
+.glass-button {
+  @apply bg-white/10 backdrop-blur-2xl border border-white/10 hover:bg-white/20 transition-all duration-300;
+  box-shadow:
+    0 4px 12px -2px rgba(0, 0, 0, 0.2),
+    inset 0 2px 4px rgba(255, 255, 255, 0.05);
+}
+
+.glass-card {
+  @apply bg-black-800/30 backdrop-blur-2xl border border-gold-500/10 transition-all duration-300 rounded-lg;
+  box-shadow:
+    0 8px 32px -4px rgba(0, 0, 0, 0.2),
+    0 4px 8px -2px rgba(0, 0, 0, 0.1),
+    inset 0 2px 4px rgba(255, 255, 255, 0.05);
+}
+
+.glass-card:hover {
+  @apply bg-black-800/40 border-gold-500/20;
+  box-shadow:
+    0 16px 48px -8px rgba(0, 0, 0, 0.3),
+    0 8px 16px -4px rgba(0, 0, 0, 0.2),
+    inset 0 2px 4px rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Widget specific glass effects */
+.glass-widget {
+  @apply glass-card relative overflow-hidden;
+}
+
+.glass-widget::before {
+  content: '';
+  @apply absolute inset-0 bg-gradient-to-br from-gold-500/10 to-transparent opacity-50;
+}
+
+.glass-widget:hover::before {
+  @apply opacity-100;
+}
+
+/* Enhanced animations */
+@keyframes gradient-move {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.sponsored-gradient {
+  background: linear-gradient(
+    90deg,
+    rgba(16, 185, 129, 0.5) 0%,
+    rgba(16, 185, 129, 0.2) 50%,
+    rgba(16, 185, 129, 0.5) 100%
+  );
+  background-size: 200% 200%;
+  animation: gradient-move 3s ease infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { 
+    box-shadow: 0 0 32px rgba(234, 213, 192, 0.2);
+    border-color: rgba(234, 213, 192, 0.4);
+  }
+  50% { 
+    box-shadow: 0 0 48px rgba(234, 213, 192, 0.4);
+    border-color: rgba(234, 213, 192, 0.6);
+  }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+/* Enhanced glass card transitions */
+.glass-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Enhanced glass panel transitions */
+.glass-panel {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Enhanced button transitions */
+.glass-button {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 
+    0 6px 16px -3px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.1);
+}
