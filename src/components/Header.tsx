@@ -1,5 +1,5 @@
 import { useState } from 'react';
-    import { Menu, X, Home, Building2, TrendingUp, HelpCircle, LogIn, UserCircle, LogOut, Calculator, FileText, BookOpen, Diamond, ShieldCheck } from 'lucide-react';
+    import { Menu, X, Home, Building2, TrendingUp, HelpCircle, LogIn, UserCircle, LogOut, Calculator, FileText, BookOpen, Diamond } from 'lucide-react';
     import { Button } from '@/components/ui/button';
     import { useAuth } from '@/lib/context/auth';
     import { Link } from 'react-router-dom';
@@ -26,7 +26,7 @@ import { useState } from 'react';
             <div className="flex items-center justify-between">
               {/* Logo */}
               <Link to="/" className="flex items-center gap-2 group">
-                <span className="text-2xl font-bold text-white tracking-tight">Very Good Estates</span>
+                <span className="text-2xl font-bold text-white tracking-tight">MyVGE</span>
               </Link>
 
               {/* Navigation */}
@@ -94,14 +94,6 @@ import { useState } from 'react';
                           <UserCircle className="h-4 w-4 mr-2 text-white" />
                           Manage Account
                         </DropdownMenuItem>
-                        {user.role === 'admin' && (
-                          <DropdownMenuItem asChild className="text-white hover:text-white hover:bg-navy-700">
-                            <Link to="/admin">
-                              <ShieldCheck className="h-4 w-4 mr-2 text-white" />
-                              Admin Panel
-                            </Link>
-                          </DropdownMenuItem>
-                        )}
                         <DropdownMenuItem onClick={logout} className="text-white hover:text-white hover:bg-navy-700">
                           <LogOut className="h-4 w-4 mr-2 text-white" />
                           Logout

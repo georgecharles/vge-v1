@@ -7,14 +7,14 @@ import { useState, useEffect } from 'react';
     import { MarketWidget } from '@/components/MarketWidget';
     import { PortfolioStats } from '@/components/PortfolioStats';
     import { useAuth } from '@/lib/context/auth';
-    import { Bell, Camera, Settings, Star, Newspaper, CreditCard, ChevronRight } from 'lucide-react';
+    import { Bell, Camera, Settings, Star, Newspaper, CreditCard, ChevronRight, Lightbulb } from 'lucide-react';
     import { Link, useNavigate } from 'react-router-dom';
     import { generateMockProperties } from '@/lib/mockData';
     import { MarketSentimentWidget, AIPredictionsWidget, RegionalPerformanceWidget } from '@/components/MarketWidgets';
-    import { PropertyCard } from '@/components/PropertyCard';
+    import PropertyCard from '@/components/PropertyCard';
     import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
     import type { Property } from '@/lib/types';
-    import { Checkbox } from '@/components/ui/checkbox';
+    import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
     export function Account() {
       const { user, unsaveProperty } = useAuth();
@@ -28,6 +28,7 @@ import { useState, useEffect } from 'react';
         marketKeywords: ''
       });
       const [savedProperties, setSavedProperties] = useState<Property[]>([]);
+      const [isTipsModalOpen, setIsTipsModalOpen] = useState(false);
       const [selectedProperties, setSelectedProperties] = useState<string[]>([]);
 
       const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,7 +57,9 @@ import { useState, useEffect } from 'react';
         const loadSavedProperties = async () => {
           if (user?.savedProperties) {
             const allProperties = await generateMockProperties(20);
-            const userSaved = allProperties.filter(p => user.savedProperties.includes(p.id.toString()));
+            const userSaved = allProperties.filter(p => 
+              user.savedProperties.includes(p.id.toString())
+            );
             setSavedProperties(userSaved);
           }
         };
@@ -107,6 +110,14 @@ import { useState, useEffect } from 'react';
         { id: 'ai-predictions', title: 'AI Predictions', content: <AIPredictionsWidget /> },
         { id: 'regional-performance', title: 'Regional Performance', content: <RegionalPerformanceWidget /> }
       ];
+
+      const handleOpenTipsModal = () => {
+        setIsTipsModalOpen(true);
+      };
+
+      const handleCloseTipsModal = () => {
+        setIsTipsModalOpen(false);
+      };
 
       return (
         <>
@@ -218,24 +229,14 @@ import { useState, useEffect } from 'react';
                           <CarouselContent className="p-4">
                             {savedProperties.map((property) => (
                               <CarouselItem key={property.id} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/4 px-4">
-                                <div className="relative">
-                                  <PropertyCard {...property} onUnsave={() => handlePropertyRemove(property.id.toString())} />
-                                  <div className="absolute top-2 right-2 z-10">
-                                    <Checkbox
-                                      id={`property-${property.id}`}
-                                      checked={selectedProperties.includes(property.id.toString())}
-                                      onCheckedChange={() => handlePropertySelect(property.id.toString())}
-                                    />
-                                    <Label htmlFor={`property-${property.id}`} className="sr-only">Select Property</Label>
-                                  </div>
-                                </div>
-                            </CarouselItem>
-                          ))}
-                        </CarouselContent>
-                      </Carousel>
+                                <PropertyCard {...property} onUnsave={() => handlePropertyRemove(property.id.toString())} />
+                              </CarouselItem>
+                            ))}
+                          </CarouselContent>
+                        </Carousel>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
                   {/* Latest News */}
                   <div className="bg-navy-800/30 backdrop-blur-md rounded-xl p-6 border border-gold-500/10">
@@ -279,7 +280,43 @@ import { useState, useEffect } from 'react';
 
               {/* ... other TabsContent components ... */}
             </Tabs>
+            <div className="flex justify-center mt-8">
+              <Button onClick={handleOpenTipsModal} className="bg-gold-500 text-navy-950 hover:bg-gold-600">
+                <Lightbulb className="w-4 h-4 mr-2" />
+                Tips on Investing
+              </Button>
+            </div>
           </div>
+
+          <Dialog open={isTipsModalOpen} onOpenChange={handleCloseTipsModal}>
+            <DialogContent className="max-w-3xl bg-navy-900 border-gold-500/20">
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-light text-white">Tips on Investing</DialogTitle>
+              </DialogHeader>
+              <div className="p-6 space-y-4">
+                <h4 className="text-lg font-light text-white">Serviced Accommodation</h4>
+                <p className="text-gray-400">
+                  Consider properties suitable for short-term rentals. Focus on locations with high tourist demand and amenities that attract travelers.
+                </p>
+                <h4 className="text-lg font-light text-white">Rent-to-Rent</h4>
+                <p className="text-gray-400">
+                  Explore opportunities to rent properties and sublet them for a higher price. This strategy requires careful management and market analysis.
+                </p>
+                <h4 className="text-lg font-light text-white">BRRR Strategy</h4>
+                <p className="text-gray-400">
+                  Buy properties that need renovation, refurbish them, refinance to pull out capital, and then rent them out. This strategy can create value and generate cash flow.
+                </p>
+                <h4 className="text-lg font-light text-white">HMOs</h4>
+                <p className="text-gray-400">
+                  Look for properties that can be converted into Houses in Multiple Occupation (HMOs) to maximize rental income. Ensure compliance with local regulations.
+                </p>
+                <h4 className="text-lg font-light text-white">Location, Location, Location</h4>
+                <p className="text-gray-400">
+                  Always prioritize locations with strong economic growth, good transport links, and high demand for rental properties.
+                </p>
+              </div>
+            </DialogContent>
+          </Dialog>
         </>
       );
     }

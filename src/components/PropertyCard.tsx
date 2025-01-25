@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Heart, Bed, Bath, Square, TrendingUp, Clock, Building2, PoundSterling, HelpCircle, Check, X } from 'lucide-react';
+import { Heart, Edit, Copy, Bed, Bath, Square, TrendingUp, Clock, Building2, PoundSterling, HelpCircle, Check, X } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +9,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Property } from '@/lib/types';
 import { motion, AnimatePresence } from 'framer-motion';
 import { addToRecentlyViewed } from '@/lib/cookies';
+import { Button } from '@/components/ui/button';
 
 const GLOW_COLORS = {
   good: 'before:shadow-emerald-500/20 after:shadow-emerald-500/20 before:animate-border-glow-good after:animate-border-glow-good',
@@ -18,6 +19,9 @@ const GLOW_COLORS = {
 
 interface PropertyCardProps extends Property {
   onUnsave?: () => void;
+  onEdit?: () => void;
+  onDuplicate?: () => void;
+  isEdited?: boolean;
   isSponsored?: boolean;
 }
 
@@ -43,7 +47,7 @@ const popVariants = {
   }
 };
 
-export function PropertyCard({
+function PropertyCard({
   id,
   title,
   address,
@@ -62,6 +66,9 @@ export function PropertyCard({
   isMortgageable,
   location,
   onUnsave,
+  onEdit,
+  onDuplicate,
+  isEdited = false,
   isSponsored = false,
 }: PropertyCardProps) {
   const { user, saveProperty, unsaveProperty } = useAuth();
@@ -101,7 +108,7 @@ export function PropertyCard({
 
   const getInvestmentLabels = () => {
     const labels = [];
-
+    
     // BRRR Strategy
     if (isFixerUpper) {
       labels.push({
@@ -110,7 +117,7 @@ export function PropertyCard({
         color: 'bg-emerald-500'
       });
     }
-
+    
     // HMO Potential
     if (estimatedRevenue > price * 0.008) { // Over 8% yield
       labels.push({
@@ -119,7 +126,7 @@ export function PropertyCard({
         color: 'bg-blue-500'
       });
     }
-
+    
     // Short-term Accommodation
     if (location?.coordinates?.lat > 51.5 && location?.coordinates?.lng < -0.1) {
       labels.push({
@@ -159,14 +166,14 @@ export function PropertyCard({
 
   return (
     <Link to={`/property/${id}`} className="block">
-      <div
+      <div 
         className={cn(
           "glass-card rounded-lg overflow-hidden group hover:scale-[1.02] transition-all duration-300 relative bg-black-800/50",
           "relative before:absolute before:inset-0 before:rounded-lg before:p-[2px] before:bg-gradient-to-r",
           isSponsored
             ? 'sponsored-gradient shadow-[0_0_30px_-5px] shadow-emerald-500/30'
-            : analysis.priceRating === 'good'
-            ? 'before:from-emerald-500/30 before:to-emerald-500/0 shadow-[0_0_30px_-5px] shadow-emerald-500/20'
+            : analysis.priceRating === 'good' 
+            ? 'before:from-emerald-500/30 before:to-emerald-500/0 shadow-[0_0_30px_-5px] shadow-emerald-500/20' 
             : analysis.priceRating === 'bad'
             ? 'before:from-red-500/30 before:to-red-500/0 shadow-[0_0_30px_-5px] shadow-red-500/20'
             : 'before:from-gold-500/30 before:to-gold-500/0 shadow-[0_0_30px_-5px] shadow-gold-500/20',
@@ -232,20 +239,40 @@ export function PropertyCard({
                 )}
               </AnimatePresence>
             </button>
+            <div className="absolute top-4 right-4 flex flex-col gap-2">
+              <Button
+                className="p-2 rounded-full glass-button text-white hover:bg-gold-500/20"
+                onClick={onUnsave}
+              >
+                <Heart className="w-4 h-4" />
+              </Button>
+              <Button
+                className="p-2 rounded-full glass-button text-white hover:bg-gold-500/20"
+                onClick={onEdit}
+              >
+                <Edit className="w-4 h-4" />
+              </Button>
+              <Button
+                className="p-2 rounded-full glass-button text-white hover:bg-gold-500/20"
+                onClick={onDuplicate}
+              >
+                <Copy className="w-4 h-4" />
+              </Button>
+            </div>
             <div className="absolute top-4 left-4 flex flex-wrap gap-2">
               <TooltipProvider>
                 {getInvestmentLabels().map((label, index) => (
                   <Tooltip key={`${label.text}-${index}`} delayDuration={0}>
                     <TooltipTrigger asChild>
-                      <Badge
+                      <Badge 
                         className={`${label.color} text-white hover:${label.color} flex items-center gap-1 cursor-help z-20`}
                       >
                         {label.text}
                         <HelpCircle className="w-3 h-3" />
                       </Badge>
                     </TooltipTrigger>
-                    <TooltipContent
-                      side="bottom"
+                    <TooltipContent 
+                      side="bottom" 
                       className="bg-black-900/95 backdrop-blur-md text-white border border-gold-500/20 max-w-xs z-[100] shadow-lg shadow-black/50"
                     >
                       <p className="max-w-xs">
@@ -266,7 +293,7 @@ export function PropertyCard({
               </div>
               <div className="text-right">
                 <div className="text-xl font-bold text-white">£{price.toLocaleString()}</div>
-                <div className="text-sm text-gray-400">£{Math.round(price / sqft).toLocaleString()}/sqft</div>
+                <div className="text-sm text-gray-400">£{Math.round(price/sqft).toLocaleString()}/sqft</div>
               </div>
             </div>
 
@@ -286,11 +313,11 @@ export function PropertyCard({
                       <span className="text-white">{bedrooms}</span>
                     </div>
                   </TooltipTrigger>
-                  <TooltipContent
-                    side="bottom"
+                  <TooltipContent 
+                    side="bottom" 
                     className="bg-black-900/95 backdrop-blur-md text-white border border-gold-500/20 shadow-lg shadow-black/50 z-[100]"
                   >
-                    {bedrooms >= 3
+                    {bedrooms >= 3 
                       ? "Good number of bedrooms for rental potential"
                       : "Limited rental potential with fewer bedrooms"}
                   </TooltipContent>
@@ -312,11 +339,11 @@ export function PropertyCard({
                       <span className="text-white">{bathrooms}</span>
                     </div>
                   </TooltipTrigger>
-                  <TooltipContent
-                    side="bottom"
+                  <TooltipContent 
+                    side="bottom" 
                     className="bg-black-900/95 backdrop-blur-md text-white border border-gold-500/20 shadow-lg shadow-black/50 z-[100]"
                   >
-                    {bathrooms >= 2
+                    {bathrooms >= 2 
                       ? "Good bathroom to bedroom ratio"
                       : "May need additional bathrooms for optimal rental"}
                   </TooltipContent>
@@ -340,11 +367,11 @@ export function PropertyCard({
                       <span className="text-white">{sqft}</span>
                     </div>
                   </TooltipTrigger>
-                  <TooltipContent
-                    side="bottom"
+                  <TooltipContent 
+                    side="bottom" 
                     className="bg-black-900/95 backdrop-blur-md text-white border border-gold-500/20 shadow-lg shadow-black/50 z-[100]"
                   >
-                    {sqft >= 800
+                    {sqft >= 800 
                       ? "Excellent size with good potential for value add"
                       : sqft >= 600
                       ? "Average size for the property type"

@@ -67,19 +67,6 @@ import Cookies from 'js-cookie';
       return parsedSettings;
     }
 
-    export function addToRecentlyViewed(propertyId: string) {
-      const settings = getUserSettings();
-      const recentlyViewed = settings.recentlyViewed || [];
-      
-      // Remove if exists and add to front
-      const newRecentlyViewed = [
-        propertyId,
-        ...recentlyViewed.filter(id => id !== propertyId)
-      ].slice(0, 10); // Keep last 10
-
-      saveUserSettings({ recentlyViewed: newRecentlyViewed });
-    }
-
     export function addToSearchHistory(location: string) {
       const settings = getUserSettings();
       const searchHistory = settings.searchHistory || [];
@@ -100,4 +87,17 @@ import Cookies from 'js-cookie';
 
     export function clearUserSettings() {
       Cookies.remove(COOKIE_NAME);
+    }
+
+    export function addToRecentlyViewed(propertyId: string) {
+      const settings = getUserSettings();
+      const recentlyViewed = settings.recentlyViewed || [];
+      
+      // Remove if exists and add to front
+      const newRecentlyViewed = [
+        propertyId,
+        ...recentlyViewed.filter(id => id !== propertyId)
+      ].slice(0, 10); // Keep last 10
+
+      saveUserSettings({ recentlyViewed: newRecentlyViewed });
     }

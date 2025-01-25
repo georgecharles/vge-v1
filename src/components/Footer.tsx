@@ -8,11 +8,7 @@ import { Building2, Mail, Phone, MapPin, Facebook, Twitter, Instagram, Linkedin 
               {/* Company Info */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <img 
-                    src="https://i.postimg.cc/FKPzkxYm/file.png"
-                    alt="Very Good Estates"
-                    className="h-16 rounded-lg"
-                  />
+                  <span className="text-2xl font-bold text-white tracking-tight">MyVGE</span>
                 </div>
                 <p className="text-gray-400 font-light">
                   Premium property search with AI-powered valuations and market insights.
@@ -85,15 +81,15 @@ import { Building2, Mail, Phone, MapPin, Facebook, Twitter, Instagram, Linkedin 
                 <div>
                   <h4 className="text-white font-light mb-4">Legal Information</h4>
                   <p className="text-gray-400 text-sm font-light mb-8">
-                    Very Good Estates is registered in England and Wales under company number 12345678. 
+                    MyVGE is registered in England and Wales under company number 12345678. 
                     Registered Office: Lytchett House, 13 Freeland Park, Poole, Dorset, England, BH16 6FA. 
                     VAT Registration Number: GB 123 4567 89.
                   </p>
                   <div className="flex items-center gap-4">
                     <img 
                       src="https://www.zoopla.co.uk/static/images/mashery/powered-by-zoopla-150x73.png" 
-                      width="150" 
-                      height="73" 
+                      width="100" 
+                      height="49" 
                       title="Property information powered by Zoopla" 
                       alt="Property information powered by Zoopla" 
                       className="opacity-80 hover:opacity-100 transition-opacity"
@@ -116,7 +112,7 @@ import { Building2, Mail, Phone, MapPin, Facebook, Twitter, Instagram, Linkedin 
 
               <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                 <p className="text-gray-400 text-sm font-light">
-                  © 2024 Very Good Estates. All rights reserved.
+                  © 2024 MyVGE. All rights reserved.
                 </p>
                 <div className="flex flex-wrap gap-6 text-sm">
                   <a href="/privacy" className="text-gray-400 hover:text-gold-400 font-light">Privacy Policy</a>

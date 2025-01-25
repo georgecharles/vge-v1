@@ -156,7 +156,7 @@ import { useState } from 'react';
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
                       required
-                      className="bg-navy-800 border-gold-500/20"
+                      className="bg-navy-800 border-gold-500/20 text-black"
                     />
                   </div>
                   <div className="space-y-2">
@@ -167,7 +167,7 @@ import { useState } from 'react';
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       required
-                      className="bg-navy-800 border-gold-500/20"
+                      className="bg-navy-800 border-gold-500/20 text-black"
                     />
                   </div>
                   <div className="space-y-2">
@@ -178,7 +178,7 @@ import { useState } from 'react';
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
-                      className="bg-navy-800 border-gold-500/20"
+                      className="bg-navy-800 border-gold-500/20 text-black"
                     />
                   </div>
                   <Button type="submit" className="w-full bg-gold-500 text-navy-950 hover:bg-gold-600">
@@ -198,7 +198,7 @@ import { useState } from 'react';
                       onChange={(e) => setAddress(e.target.value)}
                       placeholder="Enter your address"
                       required
-                      className="bg-navy-800 border-gold-500/20"
+                      className="bg-navy-800 border-gold-500/20 text-black"
                     />
                   </div>
                   <div className="space-y-2">
@@ -210,7 +210,7 @@ import { useState } from 'react';
                       onChange={(e) => setPostcode(e.target.value)}
                       placeholder="Enter your postcode"
                       required
-                      className="bg-navy-800 border-gold-500/20"
+                      className="bg-navy-800 border-gold-500/20 text-black"
                     />
                   </div>
                   <Button type="submit" className="w-full bg-gold-500 text-navy-950 hover:bg-gold-600">
@@ -233,7 +233,7 @@ import { useState } from 'react';
                         type="file"
                         accept="image/*"
                         onChange={handleProfileImageChange}
-                        className="bg-navy-800 border-gold-500/20"
+                        className="bg-navy-800 border-gold-500/20 text-black"
                       />
                       <div className="flex gap-2">
                         {sampleAvatars.map((avatar, index) => (
@@ -268,7 +268,7 @@ import { useState } from 'react';
                         type="file"
                         accept="image/*"
                         onChange={handleBannerImageChange}
-                        className="bg-navy-800 border-gold-500/20"
+                        className="bg-navy-800 border-gold-500/20 text-black"
                       />
                       <div className="flex gap-2">
                         {sampleBanners.map((banner, index) => (
