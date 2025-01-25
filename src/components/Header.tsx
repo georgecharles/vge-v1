@@ -1,5 +1,5 @@
 import { useState } from 'react';
-    import { Menu, X, Home, Building2, TrendingUp, HelpCircle, LogIn, UserCircle, LogOut, Calculator, FileText, BookOpen, Heart } from 'lucide-react';
+    import { Menu, X, Home, Building2, TrendingUp, HelpCircle, LogIn, UserCircle, LogOut, Calculator, FileText, BookOpen, Diamond, ShieldCheck } from 'lucide-react';
     import { Button } from '@/components/ui/button';
     import { useAuth } from '@/lib/context/auth';
     import { Link } from 'react-router-dom';
@@ -10,6 +10,7 @@ import { useState } from 'react';
       DropdownMenuTrigger,
     } from "@/components/ui/dropdown-menu";
     import { AccountModal } from './auth/AccountModal';
+    import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
     export function Header({ onAuthClick }: { onAuthClick: () => void }) {
       const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -25,11 +26,7 @@ import { useState } from 'react';
             <div className="flex items-center justify-between">
               {/* Logo */}
               <Link to="/" className="flex items-center gap-2 group">
-                <img 
-                  src="https://i.postimg.cc/FKPzkxYm/file.png"
-                  alt="Very Good Estates"
-                  className="h-16 transition-transform duration-300 group-hover:scale-110 rounded-lg"
-                />
+                <span className="text-2xl font-bold text-white tracking-tight">Very Good Estates</span>
               </Link>
 
               {/* Navigation */}
@@ -72,11 +69,7 @@ import { useState } from 'react';
               {/* Auth Section */}
               <div className="hidden md:flex items-center gap-4">
                 <Link to="/subscription" className="text-gold-400 hover:text-gold-500 flex items-center gap-2 font-light transition-colors whitespace-nowrap">
-                  <img 
-                    src="https://static.vecteezy.com/system/resources/thumbnails/008/513/899/small_2x/blue-diamond-illustration-png.png"
-                    alt="Diamond" 
-                    className="w-4 h-4"
-                  />
+                  <Diamond className="w-4 h-4" />
                   {user ? 'Upgrade' : 'Join Investors'}
                 </Link>
                 {user ? (
@@ -84,11 +77,9 @@ import { useState } from 'react';
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="text-white font-light">
-                          <img 
-                            src="https://i.postimg.cc/j216481G/avatar.png"
-                            alt={user.firstName}
-                            className="w-8 h-8 rounded-full object-cover mr-2"
-                          />
+                          <Avatar className="mr-2">
+                            <AvatarFallback style={{ backgroundColor: 'black', color: 'white' }}>{user.firstName.charAt(0)}</AvatarFallback>
+                          </Avatar>
                           {user.firstName}
                         </Button>
                       </DropdownMenuTrigger>
@@ -96,19 +87,21 @@ import { useState } from 'react';
                         <DropdownMenuItem asChild className="text-white hover:text-white hover:bg-navy-700">
                           <Link to="/account">
                             <UserCircle className="h-4 w-4 mr-2 text-white" />
-                            View Account
+                            My Dashboard
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setIsAccountModalOpen(true)} className="text-white hover:text-white hover:bg-navy-700">
                           <UserCircle className="h-4 w-4 mr-2 text-white" />
                           Manage Account
                         </DropdownMenuItem>
-                        <DropdownMenuItem asChild className="text-white hover:text-white hover:bg-navy-700">
-                          <Link to="/portfolio">
-                            <Heart className="h-4 w-4 mr-2 text-white" />
-                            Portfolio
-                          </Link>
-                        </DropdownMenuItem>
+                        {user.role === 'admin' && (
+                          <DropdownMenuItem asChild className="text-white hover:text-white hover:bg-navy-700">
+                            <Link to="/admin">
+                              <ShieldCheck className="h-4 w-4 mr-2 text-white" />
+                              Admin Panel
+                            </Link>
+                          </DropdownMenuItem>
+                        )}
                         <DropdownMenuItem onClick={logout} className="text-white hover:text-white hover:bg-navy-700">
                           <LogOut className="h-4 w-4 mr-2 text-white" />
                           Logout
@@ -182,10 +175,6 @@ import { useState } from 'react';
                   </Link>
                   {user ? (
                     <div className="flex flex-col gap-2 pt-4 border-t border-gold-500/20">
-                      <Link to="/portfolio" className="text-white/80 hover:text-gold-400 flex items-center gap-2 font-light transition-colors">
-                        <Heart className="h-4 w-4" />
-                        Portfolio
-                      </Link>
                       <Button variant="ghost" className="text-white justify-start font-light" onClick={() => setIsAccountModalOpen(true)}>
                         <img 
                           src="https://i.postimg.cc/j216481G/avatar.png"
@@ -194,6 +183,12 @@ import { useState } from 'react';
                         />
                         Manage Account
                       </Button>
+                      {user.role === 'admin' && (
+                        <Link to="/admin" className="text-white/80 hover:text-gold-400 flex items-center gap-2 font-light transition-colors">
+                          <ShieldCheck className="h-4 w-4" />
+                          Admin Panel
+                        </Link>
+                      )}
                       <Button variant="ghost" className="text-white justify-start font-light" onClick={logout}>
                         <LogOut className="h-4 w-4 mr-2" />
                         Logout
