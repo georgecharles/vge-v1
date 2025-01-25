@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Heart, Edit, Copy, Bed, Bath, Square, TrendingUp, Clock, Building2, PoundSterling, HelpCircle, Check, X } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/lib/context/auth';
 import { cn } from '@/lib/utils';
@@ -74,6 +74,8 @@ function PropertyCard({
   const { user, saveProperty, unsaveProperty } = useAuth();
   const isSaved = user?.savedProperties.includes(id.toString());
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const locationPath = useLocation();
+  const showEditButtons = locationPath.pathname === '/account';
 
   const nextImage = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -119,7 +121,7 @@ function PropertyCard({
     }
     
     // HMO Potential
-    if (estimatedRevenue > price * 0.008) { // Over 8% yield
+    if (estimatedRevenue > price * 0.008) {
       labels.push({
         text: 'HMO Potential',
         tooltip: 'High yield potential suitable for House in Multiple Occupation conversion',
@@ -239,26 +241,28 @@ function PropertyCard({
                 )}
               </AnimatePresence>
             </button>
-            <div className="absolute top-4 right-4 flex flex-col gap-2">
-              <Button
-                className="p-2 rounded-full glass-button text-white hover:bg-gold-500/20"
-                onClick={onUnsave}
-              >
-                <Heart className="w-4 h-4" />
-              </Button>
-              <Button
-                className="p-2 rounded-full glass-button text-white hover:bg-gold-500/20"
-                onClick={onEdit}
-              >
-                <Edit className="w-4 h-4" />
-              </Button>
-              <Button
-                className="p-2 rounded-full glass-button text-white hover:bg-gold-500/20"
-                onClick={onDuplicate}
-              >
-                <Copy className="w-4 h-4" />
-              </Button>
-            </div>
+            {showEditButtons && (
+              <div className="absolute top-4 right-4 flex flex-col gap-2">
+                <Button
+                  className="p-2 rounded-full glass-button text-white hover:bg-gold-500/20"
+                  onClick={onUnsave}
+                >
+                  <Heart className="w-4 h-4" />
+                </Button>
+                <Button
+                  className="p-2 rounded-full glass-button text-white hover:bg-gold-500/20"
+                  onClick={onEdit}
+                >
+                  <Edit className="w-4 h-4" />
+                </Button>
+                <Button
+                  className="p-2 rounded-full glass-button text-white hover:bg-gold-500/20"
+                  onClick={onDuplicate}
+                >
+                  <Copy className="w-4 h-4" />
+                </Button>
+              </div>
+            )}
             <div className="absolute top-4 left-4 flex flex-wrap gap-2">
               <TooltipProvider>
                 {getInvestmentLabels().map((label, index) => (
