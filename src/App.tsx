@@ -4,7 +4,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
     import { Header } from '@/components/Header';
     import { Footer } from '@/components/Footer';
     import { AuthModal } from '@/components/auth/AuthModal';
-    import { BetaModal } from '@/components/BetaModal';
     import { Breadcrumbs } from '@/components/Breadcrumbs';
     import { AuthProvider, useAuth } from '@/lib/context/auth';
     import { LocationProvider } from '@/lib/context/location';
@@ -70,7 +69,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 
       return (
         <>
-          {showHeaderFooter && <Header />}
+          {showHeaderFooter && <Header onAuthClick={() => setIsAuthModalOpen(true)} />}
           {showHeaderFooter && (
             <div className="max-w-7xl mx-auto px-4 py-4">
               <Breadcrumbs />
@@ -158,12 +157,10 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
                 <AuthModal 
                   isOpen={isAuthModalOpen}
                   onClose={() => setIsAuthModalOpen(false)}
-                  onSuccess={(user) => {
+                  onSuccess={() => {
                     setIsAuthModalOpen(false);
                   }}
                 />
-
-                {/* BetaModal removed */}
 
               </div>
             </Router>

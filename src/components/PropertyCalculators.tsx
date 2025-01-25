@@ -1,5 +1,4 @@
-
-    import { useState } from 'react';
+import { useState } from 'react';
     import { Calculator, PoundSterling, TrendingUp, Home } from 'lucide-react';
     import { PropertyHero } from '@/components/PropertyHero';
     import { MarketWidget } from '@/components/MarketWidget';

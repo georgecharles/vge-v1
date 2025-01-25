@@ -1,5 +1,5 @@
 import { useState } from 'react';
-    import { Menu, X, Home, Building2, TrendingUp, HelpCircle, LogIn, UserCircle, LogOut, Calculator, FileText, BookOpen, Diamond } from 'lucide-react';
+    import { Menu, X, Home, Building2, TrendingUp, HelpCircle, LogIn, UserCircle, LogOut, Calculator, FileText, BookOpen, Diamond, ShieldCheck } from 'lucide-react';
     import { Button } from '@/components/ui/button';
     import { useAuth } from '@/lib/context/auth';
     import { Link } from 'react-router-dom';
@@ -10,7 +10,7 @@ import { useState } from 'react';
       DropdownMenuTrigger,
     } from "@/components/ui/dropdown-menu";
     import { AccountModal } from './auth/AccountModal';
-    import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+    import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
     export function Header({ onAuthClick }: { onAuthClick: () => void }) {
       const [isMenuOpen, setIsMenuOpen] = useState(false);
