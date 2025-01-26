@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { propertyDataCache } from './cache';
 
 interface RightmoveProperty {

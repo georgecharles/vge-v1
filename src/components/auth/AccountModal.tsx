@@ -8,7 +8,7 @@ import { useState } from 'react';
     import { changePassword, updateUserPreferences } from '@/lib/auth';
     import { useAuth } from '@/lib/context/auth';
     import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-    import { Camera } from 'lucide-react';
+import { User } from '@/lib/types';
 
     interface AccountModalProps {
       isOpen: boolean;
@@ -61,15 +61,15 @@ import { useState } from 'react';
           // In a real app, we would geocode the address here
           const mockCoordinates = { lat: 51.5074, lng: -0.1278 }; // London coordinates
           
-          const updatedUser = await updateUserPreferences(user!.id, {
+          const updatedLocationUser = await updateUserPreferences(user!.id, {
             location: {
               address,
               postcode,
               coordinates: mockCoordinates
             }
-          });
+          }) as User;
 
-          updateUser(updatedUser);
+          updateUser(updatedLocationUser);
           
           toast({
             title: "Success",
@@ -81,36 +81,6 @@ import { useState } from 'react';
             description: "Failed to update location preferences",
             variant: "destructive"
           });
-        }
-      };
-
-      const handleProfileImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onloadend = async () => {
-            setProfileImage(reader.result as string);
-            if (user) {
-              const updatedUser = await updateUserPreferences(user.id, { avatar: reader.result });
-              updateUser(updatedUser);
-            }
-          };
-          reader.readAsDataURL(file);
-        }
-      };
-
-      const handleBannerImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onloadend = async () => {
-            setBannerImage(reader.result as string);
-            if (user) {
-              const updatedUser = await updateUserPreferences(user.id, { banner: reader.result });
-              updateUser(updatedUser);
-            }
-          };
-          reader.readAsDataURL(file);
         }
       };
 
@@ -232,7 +202,6 @@ import { useState } from 'react';
                         id="profile-image"
                         type="file"
                         accept="image/*"
-                        onChange={handleProfileImageChange}
                         className="bg-navy-800 border-gold-500/20 text-black"
                       />
                       <div className="flex gap-2">
@@ -267,7 +236,6 @@ import { useState } from 'react';
                         id="banner-image"
                         type="file"
                         accept="image/*"
-                        onChange={handleBannerImageChange}
                         className="bg-navy-800 border-gold-500/20 text-black"
                       />
                       <div className="flex gap-2">

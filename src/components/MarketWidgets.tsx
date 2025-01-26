@@ -1,5 +1,5 @@
 import { Line } from 'react-chartjs-2';
-import { TrendingUp, ArrowUpRight, ArrowDownRight, Building2, Users, Home, PoundSterling } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, Building2, Users, Home, PoundSterling } from 'lucide-react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -54,7 +54,7 @@ export function InterestRateTracker() {
           color: '#fff',
           font: {
             family: "'Quattrocento Sans', sans-serif",
-            weight: '300'
+            weight: 300
           }
         }
       },
@@ -64,11 +64,11 @@ export function InterestRateTracker() {
         backgroundColor: 'rgba(15, 23, 42, 0.9)',
         titleFont: {
           family: "'Quattrocento Sans', sans-serif",
-          weight: '300'
+          weight: 300
         },
         bodyFont: {
           family: "'Quattrocento Sans', sans-serif",
-          weight: '300'
+          weight: 300
         }
       }
     },
@@ -81,7 +81,7 @@ export function InterestRateTracker() {
           color: '#fff',
           font: {
             family: "'Quattrocento Sans', sans-serif",
-            weight: '300'
+            weight: 300
           }
         }
       },
@@ -94,9 +94,11 @@ export function InterestRateTracker() {
           color: '#fff',
           font: {
             family: "'Quattrocento Sans', sans-serif",
-            weight: '300'
+            weight: 300
           },
-          callback: (value: number) => `${value}%`
+          callback: function (tickValue: string | number) {
+            return `${tickValue}%`;
+          }
         }
       }
     }
@@ -163,7 +165,9 @@ export function MarketPriceWidget() {
           color: 'rgba(255, 255, 255, 0.1)'
         },
         ticks: {
-          callback: (value: number) => `£${value.toLocaleString()}`
+          callback: function (tickValue: number | string) {
+            return `£${Number(tickValue).toLocaleString()}`;
+          }
         }
       },
       x: {

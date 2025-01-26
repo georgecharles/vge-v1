@@ -1,29 +1,19 @@
 import { useState } from 'react';
-    import { Calculator, PoundSterling, TrendingUp, Home } from 'lucide-react';
     import { PropertyHero } from '@/components/PropertyHero';
     import { MarketWidget } from '@/components/MarketWidget';
-    import { Button } from '@/components/ui/button';
     import { Input } from '@/components/ui/input';
     import { Label } from '@/components/ui/label';
-    import { Slider } from '@/components/ui/slider';
     import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
     import { PremiumLock } from '@/components/PremiumLock';
     import { PortfolioStats } from '@/components/PortfolioStats';
     import { useAuth } from '@/lib/context/auth';
-    import { calculateMortgage, calculateBTLReturns, calculateSAReturns, calculateDevelopment, compareInvestments, calculateStampDuty, calculateRentalYield, calculateROI } from '@/lib/calculators';
-    import {
-      Select,
-      SelectContent,
-      SelectItem,
-      SelectTrigger,
-      SelectValue,
-    } from "@/components/ui/select";
+    import { calculateMortgage, calculateBTLReturns, calculateDevelopment, compareInvestments, calculateStampDuty, calculateRentalYield, calculateROI } from '@/lib/calculators';
 
     export function PropertyCalculators() {
       const [activeTab, setActiveTab] = useState('mortgage');
-      const [isFullscreen, setIsFullscreen] = useState(false);
-      const { user } = useAuth();
-      const [showAuthModal, setShowAuthModal] = useState(false);
+      const [isFullscreen] = useState(false);
+      useAuth();
+      const [, setShowAuthModal] = useState(false);
 
       const handleAuthClick = () => {
         setShowAuthModal(true);
@@ -39,7 +29,6 @@ import { useState } from 'react';
 
       // Style for input fields with better contrast
       const inputStyle = "bg-black-900 border-gold-500/20 text-white placeholder:text-gray-400";
-      const buttonStyle = "w-full bg-gold-500 text-black-950 hover:bg-gold-600 font-medium";
       const labelStyle = "text-white mb-2 block";
 
       // BTL Calculator State
@@ -96,13 +85,6 @@ import { useState } from 'react';
       // Calculate results
       const mortgageResults = calculateMortgage(mortgageParams);
       const btlResults = calculateBTLReturns(btlParams);
-      const saResults = calculateSAReturns({
-        ...btlParams,
-        nightlyRate: 100,
-        occupancyRate: 70,
-        cleaningCost: 20,
-        platformFees: 15
-      });
       const devResults = calculateDevelopment(devParams);
       const comparisonResults = compareInvestments(comparisonParams);
       const stampDuty = calculateStampDuty(stampDutyPrice);

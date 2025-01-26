@@ -52,7 +52,7 @@ export async function getPropertyHistory(postcode: string): Promise<PropertyHist
     }));
 
     // Calculate statistics
-    const averagePrice = prices.reduce((sum, price) => sum + price.amount, 0) / prices.length;
+    const averagePrice = prices.reduce((sum: number, price: LandRegistryPrice) => sum + price.amount, 0) / prices.length;
     const oldestPrice = prices[prices.length - 1]?.amount;
     const newestPrice = prices[0]?.amount;
     const priceChange = oldestPrice ? ((newestPrice - oldestPrice) / oldestPrice) * 100 : 0;

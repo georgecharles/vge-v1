@@ -107,7 +107,7 @@ import { Line } from 'react-chartjs-2';
               color: '#fff',
               font: {
                 family: "'Quattrocento Sans', sans-serif",
-                weight: '300'
+                weight: 300
               }
             }
           },
@@ -117,11 +117,11 @@ import { Line } from 'react-chartjs-2';
             backgroundColor: 'rgba(15, 23, 42, 0.9)',
             titleFont: {
               family: "'Quattrocento Sans', sans-serif",
-              weight: '300'
+              weight: 300
             },
             bodyFont: {
               family: "'Quattrocento Sans', sans-serif",
-              weight: '300'
+              weight: 300
             },
             callbacks: {
               label: (context: any) => {
@@ -139,7 +139,7 @@ import { Line } from 'react-chartjs-2';
               color: '#fff',
               font: {
                 family: "'Quattrocento Sans', sans-serif",
-                weight: '300'
+                weight: 300
               }
             }
           },
@@ -152,9 +152,11 @@ import { Line } from 'react-chartjs-2';
               color: '#fff',
               font: {
                 family: "'Quattrocento Sans', sans-serif",
-                weight: '300'
+                weight: 300
               },
-              callback: (value: number) => `${value}%`
+              callback: function(tickValue: number | string) {
+                return `${tickValue}%`;
+              }
             }
           }
         }

@@ -30,10 +30,10 @@ import Cookies from 'js-cookie';
         try {
           await supabase
             .from('user_settings')
-            .upsert({
+            .upsert([{
               user_id: user.id,
               settings: newSettings
-            }, { onConflict: ['user_id'] });
+            }], { onConflict: 'user_id' });
         } catch (error) {
           console.error('Error saving user settings to Supabase:', error);
         }
@@ -67,8 +67,8 @@ import Cookies from 'js-cookie';
       return parsedSettings;
     }
 
-    export function addToSearchHistory(location: string) {
-      const settings = getUserSettings();
+    export async function addToSearchHistory(location: string) {
+      const settings = await getUserSettings();
       const searchHistory = settings.searchHistory || [];
       
       // Remove if exists and add to front
@@ -76,21 +76,21 @@ import Cookies from 'js-cookie';
         location,
         ...searchHistory.filter(l => l !== location)
       ].slice(0, 5); // Keep last 5
-
+    
       saveUserSettings({ searchHistory: newSearchHistory });
     }
 
-    export function saveFilters(filters: UserSettings['filters']) {
-      const settings = getUserSettings();
-      saveUserSettings({ filters: { ...settings.filters, ...filters } });
-    }
+    export async function saveFilters(filters: UserSettings['filters']) {
+          const settings = await getUserSettings();
+          saveUserSettings({ filters: { ...settings.filters, ...filters } });
+        }
 
     export function clearUserSettings() {
       Cookies.remove(COOKIE_NAME);
     }
 
-    export function addToRecentlyViewed(propertyId: string) {
-      const settings = getUserSettings();
+    export async function addToRecentlyViewed(propertyId: string) {
+      const settings = await getUserSettings();
       const recentlyViewed = settings.recentlyViewed || [];
       
       // Remove if exists and add to front
