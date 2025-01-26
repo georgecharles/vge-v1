@@ -1,5 +1,4 @@
 import { useState } from 'react';
-    import { Calculator, PoundSterling, TrendingUp, Home } from 'lucide-react';
     import { PropertyHero } from '@/components/PropertyHero';
     import { MarketWidget } from '@/components/MarketWidget';
     import { Button } from '@/components/ui/button';
@@ -7,21 +6,15 @@ import { useState } from 'react';
     import { Label } from '@/components/ui/label';
     import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
     import { useAuth } from '@/lib/context/auth';
-    import { calculateMortgage, calculateBTLReturns, calculateSAReturns, calculateDevelopment, compareInvestments, calculateStampDuty, calculateRentalYield, calculateROI } from '@/lib/calculators';
-    import {
-      Select,
-      SelectContent,
-      SelectItem,
-      SelectTrigger,
-      SelectValue,
-    } from "@/components/ui/select";
+    import { calculateMortgage, calculateBTLReturns, calculateDevelopment, compareInvestments, calculateStampDuty, calculateRentalYield, calculateROI } from '@/lib/calculators';
     import { PremiumLock } from './PremiumLock';
+import { PortfolioStats } from './PortfolioStats';
     
     export function PropertyCalculators() {
       const [activeTab, setActiveTab] = useState('mortgage');
-      const [isFullscreen, setIsFullscreen] = useState(false);
-      const { user } = useAuth();
-      const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+      const [isFullscreen] = useState(false);
+      useAuth();
+      const [, setIsAuthModalOpen] = useState(false);
 
       const handleAuthClick = () => {
         setIsAuthModalOpen(true);
@@ -94,13 +87,6 @@ import { useState } from 'react';
       // Calculate results
       const mortgageResults = calculateMortgage(mortgageParams);
       const btlResults = calculateBTLReturns(btlParams);
-      const saResults = calculateSAReturns({
-        ...btlParams,
-        nightlyRate: 100,
-        occupancyRate: 70,
-        cleaningCost: 20,
-        platformFees: 15
-      });
       const devResults = calculateDevelopment(devParams);
       const comparisonResults = compareInvestments(comparisonParams);
       const stampDuty = calculateStampDuty(stampDutyPrice);

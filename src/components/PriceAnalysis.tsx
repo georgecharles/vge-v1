@@ -1,4 +1,4 @@
-import { AlertTriangle, CheckCircle, MinusCircle, TrendingUp, TrendingDown, Scale, FileText, Gavel } from 'lucide-react';
+import { AlertTriangle, CheckCircle, MinusCircle, TrendingUp, TrendingDown, Scale, Gavel } from 'lucide-react';
 import type { PropertyPriceAnalysis } from '@/lib/types';
 
 interface PriceAnalysisProps {
@@ -107,7 +107,7 @@ export function PriceAnalysis({ analysis }: PriceAnalysisProps) {
       <div>
         <h4 className="text-lg font-light text-white mb-4">Recent Sales Nearby</h4>
         <div className="space-y-4">
-          {analysis.similarProperties.map((property, index) => (
+          {analysis.similarProperties.map((property: { address: string; price: number; soldDate: string }, index: number) => (
             <div key={index} className="flex justify-between items-center py-2 border-b border-gold-500/10">
               <div className="text-gray-300">{property.address}</div>
               <div>

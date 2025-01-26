@@ -3,35 +3,15 @@ import { PropertyFilters, type PropertyFilters as Filters } from '@/components/P
 import { PropertySort } from '@/components/PropertySort';
 import PropertyCard from '@/components/PropertyCard';
 import { useState, useRef, useEffect } from 'react';
-import { generateMockProperties } from '@/lib/mockData';
 import { motion } from 'framer-motion';
 import type { Property } from '@/lib/types';
 
 export function Home() {
-  const [properties, setProperties] = useState<Property[]>([]);
+  const [properties] = useState<Property[]>([]);
   const [filteredProperties, setFilteredProperties] = useState<Property[]>([]);
   const [sortBy, setSortBy] = useState('price_asc');
-  const [isLoading, setIsLoading] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
-
-  const handleSearch = async (location: string) => {
-    setIsLoading(true);
-    const result = await generateMockProperties(9);
-    // Mark the first property as sponsored
-    result[0] = { ...result[0], isSponsored: true };
-    setProperties(result);
-    setFilteredProperties(result);
-    handleSort(result, sortBy);
-    
-    // Smooth scroll to results
-    if (resultsRef.current) {
-      resultsRef.current.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'start'
-      });
-    }
-    setIsLoading(false);
-  };
+  const [] = useState(false);
 
   const handleSort = (props: Property[], sort: string) => {
     const sorted = [...props].sort((a, b) => {
@@ -97,6 +77,10 @@ export function Home() {
       handleSort(properties, sortBy);
     }
   }, [sortBy]);
+
+  function handleSearch(_location: string, _coordinates?: { lat: number; lng: number; } | undefined, _radius?: number | undefined): void {
+    throw new Error('Function not implemented.');
+  }
 
   return (
     <div>

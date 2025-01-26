@@ -1,13 +1,11 @@
 import { JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams} from 'react-router-dom';
 import { PropertyGallery } from '@/components/PropertyGallery';
 import { PropertyTimeline } from '@/components/PropertyTimeline';
-import { PriceAnalysis } from '@/components/PriceAnalysis';
 import { EnvironmentData } from '@/components/EnvironmentData';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Heart, Bed, Bath, Square, TrendingUp, Clock, Home, MapPin, Phone, Mail, Calculator, ExternalLink, Brain } from 'lucide-react';
+import { Heart, Bed, Bath, Square, Home, MapPin, Phone, Mail, Calculator, Brain } from 'lucide-react';
 import type { Property } from '@/lib/types';
 import { generateMockProperties } from '@/lib/mockData';
 import { addToRecentlyViewed } from '@/lib/cookies';
@@ -361,7 +359,7 @@ export function PropertyDetails() {
             <div className="bg-navy-800/50 rounded-2xl p-6 border border-gold-500/10">
               <h3 className="text-xl font-light text-white mb-4">Similar Properties</h3>
               <div className="space-y-4">
-                {similarProperties.map((similar, index) => (
+                {similarProperties.map((similar: Property, index: number) => (
                   <div key={index} className="flex items-center gap-4 p-3 bg-navy-900/50 rounded-xl">
                     <div className="w-16 h-16 bg-navy-800 rounded-lg overflow-hidden">
                       <img 
