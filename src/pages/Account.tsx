@@ -220,23 +220,22 @@ import { useState, useEffect } from 'react';
 
                   <PortfolioStats selectedProperties={selectedProperties} />
 
-                  {/* Saved Properties Carousel */}
-                  {savedProperties.length > 0 && (
+                    {/* Saved Properties Grid */}
+                    {savedProperties.length > 0 && (
                     <div className="mt-8">
                       <h2 className="text-2xl font-light text-white mb-4">Your Portfolio</h2>
-                      <div className="relative">
-                        <Carousel opts={{ loop: false, containScroll: 'trimSnaps', slidesToScroll: 4, dragFree: true }}>
-                          <CarouselContent className="p-4">
-                            {savedProperties.map((property) => (
-                              <CarouselItem key={property.id} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/4 px-4">
-                                <PropertyCard {...property} onUnsave={() => handlePropertyRemove(property.id.toString())} />
-                              </CarouselItem>
-                            ))}
-                          </CarouselContent>
-                        </Carousel>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
+                      {savedProperties.map((property) => (
+                        <PropertyCard 
+                          key={property.id} 
+                          {...property} 
+                          showDeleteButton={true}
+                          onDelete={() => handlePropertyRemove(property.id.toString())} 
+                        />
+                      ))}
                       </div>
                     </div>
-                  )}
+                    )}
 
                   {/* Latest News */}
                   <div className="bg-navy-800/30 backdrop-blur-md rounded-xl p-6 border border-gold-500/10">

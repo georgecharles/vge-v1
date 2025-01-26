@@ -227,10 +227,14 @@ function PropertyCard({
                 initial="initial"
                 animate={isSaved ? "animate" : "initial"}
               >
-                <Heart className={`w-5 h-5 ${isSaved ? 'fill-current text-red-500' : ''}`} />
+                {showEditButtons ? (
+                  <X className="w-5 h-5" />
+                ) : (
+                  <Heart className={`w-5 h-5 ${isSaved ? 'fill-current text-red-500' : ''}`} />
+                )}
               </motion.div>
               <AnimatePresence>
-                {isSaved && (
+                {isSaved && !showEditButtons && (
                   <motion.div
                     className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"
                     variants={popVariants}
@@ -241,28 +245,6 @@ function PropertyCard({
                 )}
               </AnimatePresence>
             </button>
-            {showEditButtons && (
-              <div className="absolute top-4 right-4 flex flex-col gap-2">
-                <Button
-                  className="p-2 rounded-full glass-button text-white hover:bg-gold-500/20"
-                  onClick={onUnsave}
-                >
-                  <Heart className="w-4 h-4" />
-                </Button>
-                <Button
-                  className="p-2 rounded-full glass-button text-white hover:bg-gold-500/20"
-                  onClick={onEdit}
-                >
-                  <Edit className="w-4 h-4" />
-                </Button>
-                <Button
-                  className="p-2 rounded-full glass-button text-white hover:bg-gold-500/20"
-                  onClick={onDuplicate}
-                >
-                  <Copy className="w-4 h-4" />
-                </Button>
-              </div>
-            )}
             <div className="absolute top-4 left-4 flex flex-wrap gap-2">
               <TooltipProvider>
                 {getInvestmentLabels().map((label, index) => (
