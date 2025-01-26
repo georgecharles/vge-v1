@@ -56,14 +56,6 @@ import { Check } from 'lucide-react';
             imageUrl="https://images.unsplash.com/photo-1579621970795-87facc2f976d"
           >
             <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
-            <dotlottie-player 
-              src="https://lottie.host/33f6f966-dec6-4644-9352-1332624ca281/Bb8pT0BiYr.lottie" 
-              background="transparent" 
-              speed="1" 
-              style={{ width: '300px', height: '300px', margin: '0 auto' }}
-              loop 
-              autoplay
-            ></dotlottie-player>
           </PropertyHero>
 
           <div className="max-w-7xl mx-auto px-4 py-16">

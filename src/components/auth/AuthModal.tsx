@@ -7,6 +7,7 @@ import { useState } from 'react';
     import { useToast } from '@/hooks/use-toast';
     import { login } from '@/lib/auth';
     import { useAuth } from '@/lib/context/auth';
+import { User } from '@/lib/types';
 
     interface AuthModalProps {
       isOpen: boolean;
@@ -25,7 +26,7 @@ import { useState } from 'react';
       const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-          const user = await login(email, password, activeTab === 'signup' ? firstName : undefined, activeTab === 'signup' ? lastName : undefined);
+          const user = await login(email, password, activeTab === 'signup' ? firstName : undefined, activeTab === 'signup' ? lastName : undefined) as User;
           authLogin(user);
           toast({
             title: "Success!",
@@ -66,7 +67,6 @@ import { useState } from 'react';
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="bg-navy-800 border-gold-500/20 text-black"
                     />
                   </div>
                   <div className="space-y-2">
@@ -77,7 +77,6 @@ import { useState } from 'react';
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="bg-navy-800 border-gold-500/20 text-black"
                     />
                   </div>
                   <Button type="submit" className="w-full bg-gold-500 text-navy-950 hover:bg-gold-600">
@@ -96,7 +95,6 @@ import { useState } from 'react';
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
                       required
-                      className="bg-navy-800 border-gold-500/20 text-black"
                     />
                   </div>
                   <div className="space-y-2">
@@ -107,7 +105,6 @@ import { useState } from 'react';
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
                       required
-                      className="bg-navy-800 border-gold-500/20 text-black"
                     />
                   </div>
                   <div className="space-y-2">
@@ -118,7 +115,6 @@ import { useState } from 'react';
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="bg-navy-800 border-gold-500/20 text-black"
                     />
                   </div>
                   <div className="space-y-2">
@@ -129,7 +125,6 @@ import { useState } from 'react';
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="bg-navy-800 border-gold-500/20 text-black"
                     />
                   </div>
                   <Button type="submit" className="w-full bg-gold-500 text-navy-950 hover:bg-gold-600">

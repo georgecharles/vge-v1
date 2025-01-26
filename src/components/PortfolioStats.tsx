@@ -8,7 +8,6 @@ import { Calculator, TrendingUp, PieChart, Building2, PoundSterling, Home, Targe
     import { Input } from '@/components/ui/input';
     import { Progress } from '@/components/ui/progress';
     import { Label } from '@/components/ui/label';
-    import type { Property } from '@/lib/types';
 
     interface PortfolioTargets {
       totalValue: number;
@@ -82,7 +81,7 @@ import { Calculator, TrendingUp, PieChart, Building2, PoundSterling, Home, Targe
           if (selected.length === 2) {
             const [propertyA, propertyB] = selected;
             const newTotalValue = portfolioMetrics.totalValue - propertyA.price + propertyB.price;
-            const newPotentialProfit = portfolioMetrics.potentialProfit - (propertyA.predictedValue - propertyA.price) + (propertyB.predictedValue - propertyB.price);
+            const newPotentialProfit = portfolioMetrics.potentialProfit - (propertyA.analysis.marketTrends.priceGrowth - propertyA.price) + (propertyB.analysis.marketTrends.priceGrowth - propertyB.price);
             const newMonthlyRevenue = portfolioMetrics.monthlyRevenue - propertyA.estimatedRevenue + propertyB.estimatedRevenue;
             const newAverageYield = ((newMonthlyRevenue * 12) / newTotalValue) * 100;
             const newPredictedGrowth = ((newTotalValue - portfolioMetrics.totalValue) / portfolioMetrics.totalValue) * 100;
@@ -242,7 +241,6 @@ import { Calculator, TrendingUp, PieChart, Building2, PoundSterling, Home, Targe
                     type="number"
                     value={targets.totalValue.toString()}
                     onChange={(e) => handleTargetChange('totalValue', e.target.value)}
-                    className="bg-navy-800 border-gold-500/20 text-black"
                   />
                 </div>
                 <div>
@@ -251,7 +249,6 @@ import { Calculator, TrendingUp, PieChart, Building2, PoundSterling, Home, Targe
                     type="number"
                     value={targets.monthlyRevenue.toString()}
                     onChange={(e) => handleTargetChange('monthlyRevenue', e.target.value)}
-                    className="bg-navy-800 border-gold-500/20 text-black"
                   />
                 </div>
                 <div>
@@ -260,7 +257,6 @@ import { Calculator, TrendingUp, PieChart, Building2, PoundSterling, Home, Targe
                     type="number"
                     value={targets.averageYield.toString()}
                     onChange={(e) => handleTargetChange('averageYield', e.target.value)}
-                    className="bg-navy-800 border-gold-500/20 text-black"
                   />
                 </div>
                 <div>
@@ -269,7 +265,6 @@ import { Calculator, TrendingUp, PieChart, Building2, PoundSterling, Home, Targe
                     type="number"
                     value={targets.predictedGrowth.toString()}
                     onChange={(e) => handleTargetChange('predictedGrowth', e.target.value)}
-                    className="bg-navy-800 border-gold-500/20 text-black"
                   />
                 </div>
                 <div>
@@ -278,7 +273,6 @@ import { Calculator, TrendingUp, PieChart, Building2, PoundSterling, Home, Targe
                     type="number"
                     value={targets.totalProperties.toString()}
                     onChange={(e) => handleTargetChange('totalProperties', e.target.value)}
-                    className="bg-navy-800 border-gold-500/20 text-black"
                   />
                 </div>
               </div>

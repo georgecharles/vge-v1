@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { PropertyGallery } from '@/components/PropertyGallery';
 import { PropertyTimeline } from '@/components/PropertyTimeline';
@@ -416,7 +416,7 @@ export function PropertyDetails() {
               <div className="bg-navy-800/50 p-6 rounded-2xl border border-gold-500/10 mt-6">
                 <h3 className="text-xl font-light text-white mb-4">Property Features</h3>
                 <div className="grid md:grid-cols-2 gap-4">
-                  {property.features.map((feature, index) => (
+                  {property.features.map((feature: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined, index: Key | null | undefined) => (
                     <div key={index} className="flex items-center gap-2 text-gray-400">
                       <Home className="w-4 h-4 text-gold-400" />
                       {feature}

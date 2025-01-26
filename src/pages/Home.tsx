@@ -4,7 +4,6 @@ import { PropertySort } from '@/components/PropertySort';
 import PropertyCard from '@/components/PropertyCard';
 import { useState, useRef, useEffect } from 'react';
 import { generateMockProperties } from '@/lib/mockData';
-import { Building2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { Property } from '@/lib/types';
 
@@ -110,7 +109,6 @@ export function Home() {
       >
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c')] bg-cover bg-center opacity-10" />
         <div className="relative max-w-7xl mx-auto px-4 text-center">
-          <Building2 className="w-16 h-16 text-gold-400 mx-auto mb-6" />
           <motion.h1 
             className="text-5xl md:text-6xl font-bold text-white mb-6"
             initial={{ opacity: 0, y: 20 }}
