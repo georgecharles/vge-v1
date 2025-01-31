@@ -1,6 +1,5 @@
 import Cookies from 'js-cookie';
     import { supabase } from './supabaseClient';
-    import { useAuth } from './context/auth';
 
     interface UserSettings {
       theme?: 'light' | 'dark';
@@ -23,51 +22,15 @@ import Cookies from 'js-cookie';
       const currentSettings = await getUserSettings();
       const newSettings = { ...currentSettings, ...settings };
       Cookies.set(COOKIE_NAME, JSON.stringify(newSettings), { expires: COOKIE_EXPIRY });
-
-      // Save to Supabase if user is logged in
-      const { user } = useAuth();
-      if (user) {
-        try {
-          await supabase
-            .from('user_settings')
-            .upsert([{
-              user_id: user.id,
-              settings: newSettings
-            }], { onConflict: 'user_id' });
-        } catch (error) {
-          console.error('Error saving user settings to Supabase:', error);
-        }
-      }
     }
 
     export async function getUserSettings(): Promise<UserSettings> {
       const settings = Cookies.get(COOKIE_NAME);
       let parsedSettings: UserSettings = settings ? JSON.parse(settings) : {};
-
-      // Fetch from Supabase if user is logged in
-      const { user } = useAuth();
-      if (user) {
-        try {
-          const { data, error } = await supabase
-            .from('user_settings')
-            .select('settings')
-            .eq('user_id', user.id)
-            .single();
-
-          if (error) {
-            console.error('Error fetching user settings from Supabase:', error);
-          } else if (data && data.settings) {
-            parsedSettings = data.settings;
-          }
-        } catch (error) {
-          console.error('Error fetching user settings from Supabase:', error);
-        }
-      }
-
       return parsedSettings;
     }
 
-    export async function addToSearchHistory(location: string) {
+    export async function addToSearchHistory(location: string, user: any) {
       const settings = await getUserSettings();
       const searchHistory = settings.searchHistory || [];
       
@@ -78,6 +41,19 @@ import Cookies from 'js-cookie';
       ].slice(0, 5); // Keep last 5
     
       saveUserSettings({ searchHistory: newSearchHistory });
+
+      if (user) {
+        try {
+          await supabase
+            .from('user_settings')
+            .upsert([{
+              user_id: user.id,
+              settings: { ...settings, searchHistory: newSearchHistory }
+            }], { onConflict: 'user_id' });
+        } catch (error) {
+          console.error('Error saving user settings to Supabase:', error);
+        }
+      }
     }
 
     export async function saveFilters(filters: UserSettings['filters']) {

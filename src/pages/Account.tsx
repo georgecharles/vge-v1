@@ -10,6 +10,14 @@ import PropertyCard from '@/components/PropertyCard';
 import type { Property } from '@/lib/types';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
+interface ScrapedProperty {
+  title: string;
+  address: string;
+  price: string;
+  link: string;
+  image: string;
+}
+
 export function Account() {
   const { user, unsaveProperty } = useAuth();
   const navigate = useNavigate();
@@ -24,7 +32,10 @@ export function Account() {
   const [savedProperties, setSavedProperties] = useState<Property[]>([]);
   const [isTipsModalOpen, setIsTipsModalOpen] = useState(false);
   const [selectedProperties] = useState<string[]>([]);
-
+  const [importedProperties, setImportedProperties] = useState<ScrapedProperty[]>(() => {
+    const saved = localStorage.getItem('imported_properties');
+    return saved ? JSON.parse(saved) : [];
+  });
 
   const handlePropertyRemove = (propertyId: string) => {
     if (user) {
@@ -209,6 +220,40 @@ export function Account() {
                         showDeleteButton={true}
                         onDelete={() => handlePropertyRemove(property.id.toString())} 
                       />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Imported Properties Grid */}
+              {importedProperties.length > 0 && (
+                <div className="mt-8">
+                  <h2 className="text-2xl font-light text-white mb-4">Imported Properties</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
+                    {importedProperties.map((listing, index) => (
+                      <div
+                        key={index}
+                        className="glass-card rounded-lg overflow-hidden group hover:scale-[1.02] transition-all duration-300 relative bg-black-800/50"
+                      >
+                        <div className="relative">
+                          <img
+                            src={listing.image}
+                            alt={listing.title}
+                            className="w-full aspect-[4/3] object-cover transition-transform duration-300 group-hover:scale-105"
+                          />
+                        </div>
+                        <div className="p-6">
+                          <div className="flex justify-between items-start mb-4">
+                            <div>
+                              <h3 className="text-xl font-semibold text-white mb-2">{listing.title}</h3>
+                              <p className="text-gray-400">{listing.address}</p>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-xl font-bold text-white">{listing.price}</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </div>

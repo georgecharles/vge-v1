@@ -29,6 +29,11 @@ interface PostcodeResult {
   admin_district: string;
 }
 
+interface AddressResult {
+  address: string;
+  postcode: string;
+}
+
 export async function searchPostcode(postcode: string): Promise<PostcodeResult | null> {
   const cacheKey = `postcode-${postcode}`;
   const cached = propertyDataCache.get(cacheKey) as PostcodeResult | null;
@@ -37,7 +42,9 @@ export async function searchPostcode(postcode: string): Promise<PostcodeResult |
   }
 
   try {
+    console.log("Fetching postcode data for:", postcode);
     const response = await axios.get(`${POSTCODES_API}/${encodeURIComponent(postcode)}`);
+    console.log("Postcode API Response:", response);
     if (response.data.status === 200 && response.data.result) {
       const result = {
         postcode: response.data.result.postcode,
@@ -67,6 +74,7 @@ export async function autocompletePostcode(query: string): Promise<string[]> {
 
   try {
     const response = await axios.get(`${POSTCODES_API}/postcodes/${encodeURIComponent(query)}/autocomplete`);
+     console.log("Autocomplete API Response:", response);
     if (response.data.status === 200) {
       const results = response.data.result || [];
       propertyDataCache.set(cacheKey, results);
@@ -88,14 +96,12 @@ export async function searchLocations(query: string): Promise<string[]> {
   try {
     // Check if it looks like a postcode
     if (/^[A-Z0-9]{2,4}\s?[0-9][A-Z]{2}$/i.test(trimmedQuery)) {
-      const suggestions = await autocompletePostcode(trimmedQuery);
-      if (suggestions.length === 0) {
-        // If no postcode found, fall back to location search
-        return ukLocations.filter(location =>
-          location.toLowerCase().includes(trimmedQuery)
-        );
+      const postcodeResult = await searchPostcode(trimmedQuery);
+      if (postcodeResult) {
+        // Fetch addresses for the postcode
+        const addressResults = await fetchAddressesForPostcode(postcodeResult.postcode);
+        return addressResults.map(addr => addr.address);
       }
-      return suggestions;
     }
     
     // Search locations
@@ -106,6 +112,33 @@ export async function searchLocations(query: string): Promise<string[]> {
     if (error instanceof Error) {
       console.error('Error searching locations:', error.message);
     }
+    return [];
+  }
+}
+
+async function fetchAddressesForPostcode(postcode: string): Promise<AddressResult[]> {
+  const cacheKey = `addresses-${postcode}`;
+  const cached = propertyDataCache.get(cacheKey);
+  if (cached) return cached;
+
+  try {
+    console.log("Fetching addresses for postcode:", postcode);
+    const response = await axios.get(`${POSTCODES_API}/${encodeURIComponent(postcode)}`);
+    console.log("Addresses API Response:", response);
+    if (response.data.status === 200 && response.data.result) {
+      const addresses = response.data.result.addresses.map((addr: any) => {
+        const addressString = [addr.line_1, addr.line_2, addr.line_3].filter(Boolean).join(', ');
+        return {
+          address: `${addressString}, ${addr.postcode}`,
+          postcode: addr.postcode
+        };
+      });
+      propertyDataCache.set(cacheKey, addresses);
+      return addresses;
+    }
+    return [];
+  } catch (error) {
+    console.error('Error fetching addresses for postcode:', error);
     return [];
   }
 }
