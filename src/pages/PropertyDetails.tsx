@@ -1,13 +1,11 @@
-import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useEffect, useState } from 'react';
+import { useParams} from 'react-router-dom';
 import { PropertyGallery } from '@/components/PropertyGallery';
 import { PropertyTimeline } from '@/components/PropertyTimeline';
-import { PriceAnalysis } from '@/components/PriceAnalysis';
 import { EnvironmentData } from '@/components/EnvironmentData';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Heart, Bed, Bath, Square, TrendingUp, Clock, Home, MapPin, Phone, Mail, Calculator, ExternalLink, Brain } from 'lucide-react';
+import { Heart, Bed, Bath, Square, Home, MapPin, Phone, Mail, Calculator, Brain } from 'lucide-react';
 import type { Property } from '@/lib/types';
 import { generateMockProperties } from '@/lib/mockData';
 import { addToRecentlyViewed } from '@/lib/cookies';
@@ -361,7 +359,7 @@ export function PropertyDetails() {
             <div className="bg-navy-800/50 rounded-2xl p-6 border border-gold-500/10">
               <h3 className="text-xl font-light text-white mb-4">Similar Properties</h3>
               <div className="space-y-4">
-                {similarProperties.map((similar, index) => (
+                {similarProperties.map((similar: Property, index: number) => (
                   <div key={index} className="flex items-center gap-4 p-3 bg-navy-900/50 rounded-xl">
                     <div className="w-16 h-16 bg-navy-800 rounded-lg overflow-hidden">
                       <img 
@@ -416,7 +414,7 @@ export function PropertyDetails() {
               <div className="bg-navy-800/50 p-6 rounded-2xl border border-gold-500/10 mt-6">
                 <h3 className="text-xl font-light text-white mb-4">Property Features</h3>
                 <div className="grid md:grid-cols-2 gap-4">
-                  {property.features.map((feature, index) => (
+                  {property.features.map((feature: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined, index: Key | null | undefined) => (
                     <div key={index} className="flex items-center gap-2 text-gray-400">
                       <Home className="w-4 h-4 text-gold-400" />
                       {feature}

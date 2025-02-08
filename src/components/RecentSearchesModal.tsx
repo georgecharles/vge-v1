@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { History, Search, Trash2 } from 'lucide-react';
@@ -11,10 +11,15 @@ interface RecentSearchesModalProps {
 }
 
 export function RecentSearchesModal({ isOpen, onClose, onSearch }: RecentSearchesModalProps) {
-  const [searches, setSearches] = useState(() => {
-    const settings = getUserSettings();
-    return settings.searchHistory || [];
-  });
+  const [searches, setSearches] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      const settings = await getUserSettings();
+      setSearches(settings.searchHistory || []);
+    };
+    fetchSettings();
+  }, []);
 
   const handleSearch = (location: string) => {
     onSearch(location);

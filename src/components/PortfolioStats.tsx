@@ -8,7 +8,6 @@ import { Calculator, TrendingUp, PieChart, Building2, PoundSterling, Home, Targe
     import { Input } from '@/components/ui/input';
     import { Progress } from '@/components/ui/progress';
     import { Label } from '@/components/ui/label';
-    import type { Property } from '@/lib/types';
 
     interface PortfolioTargets {
       totalValue: number;
@@ -18,7 +17,11 @@ import { Calculator, TrendingUp, PieChart, Building2, PoundSterling, Home, Targe
       totalProperties: number;
     }
 
-    export function PortfolioStats() {
+    interface PortfolioStatsProps {
+      selectedProperties?: string[];
+    }
+
+    export function PortfolioStats({ selectedProperties }: PortfolioStatsProps) {
       const { user } = useAuth();
       const [portfolioMetrics, setPortfolioMetrics] = useState(() => 
         calculatePortfolioMetrics([])
@@ -34,6 +37,7 @@ import { Calculator, TrendingUp, PieChart, Building2, PoundSterling, Home, Targe
           totalProperties: 20
         };
       });
+      const [simulationResults, setSimulationResults] = useState<any>(null);
 
       const handleTargetChange = (key: keyof PortfolioTargets, value: string) => {
         const numValue = parseFloat(value) || 0;
@@ -70,7 +74,30 @@ import { Calculator, TrendingUp, PieChart, Building2, PoundSterling, Home, Targe
         loadPortfolioStats();
       }, [user?.savedProperties]);
 
-      if (!user?.savedProperties.length) return null;
+      const handleSimulate = async () => {
+        if (selectedProperties && selectedProperties.length === 2) {
+          const allProperties = await generateMockProperties(20);
+          const selected = allProperties.filter(p => selectedProperties.includes(p.id.toString()));
+          if (selected.length === 2) {
+            const [propertyA, propertyB] = selected;
+            const newTotalValue = portfolioMetrics.totalValue - propertyA.price + propertyB.price;
+            const newPotentialProfit = portfolioMetrics.potentialProfit - (propertyA.analysis.marketTrends.priceGrowth - propertyA.price) + (propertyB.analysis.marketTrends.priceGrowth - propertyB.price);
+            const newMonthlyRevenue = portfolioMetrics.monthlyRevenue - propertyA.estimatedRevenue + propertyB.estimatedRevenue;
+            const newAverageYield = ((newMonthlyRevenue * 12) / newTotalValue) * 100;
+            const newPredictedGrowth = ((newTotalValue - portfolioMetrics.totalValue) / portfolioMetrics.totalValue) * 100;
+
+            setSimulationResults({
+              newTotalValue,
+              newPotentialProfit,
+              newMonthlyRevenue,
+              newAverageYield,
+              newPredictedGrowth
+            });
+          }
+        } else {
+          setSimulationResults(null);
+        }
+      };
 
       return (
         <>
@@ -160,6 +187,42 @@ import { Calculator, TrendingUp, PieChart, Building2, PoundSterling, Home, Targe
                 />
               </div>
             </div>
+            
+            {selectedProperties && selectedProperties.length === 2 && (
+              <div className="flex justify-end mt-4">
+                <Button onClick={handleSimulate} className="bg-gold-500 text-navy-950 hover:bg-gold-600">
+                  Simulate
+                </Button>
+              </div>
+            )}
+
+            {simulationResults && (
+              <div className="mt-8 bg-navy-800/50 p-6 rounded-lg border border-gold-500/20">
+                <h4 className="text-lg font-light text-white mb-4">Simulation Results</h4>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <div className="text-sm text-gray-400">New Portfolio Value</div>
+                    <div className="text-xl font-light text-white">£{simulationResults.newTotalValue.toLocaleString()}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-400">New Potential Profit</div>
+                    <div className="text-xl font-light text-white">£{simulationResults.newPotentialProfit.toLocaleString()}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-400">New Monthly Revenue</div>
+                    <div className="text-xl font-light text-white">£{simulationResults.newMonthlyRevenue.toLocaleString()}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-400">New Average Yield</div>
+                    <div className="text-xl font-light text-white">{simulationResults.newAverageYield.toFixed(1)}%</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-400">New Predicted Growth</div>
+                    <div className="text-xl font-light text-white">{simulationResults.newPredictedGrowth.toFixed(1)}%</div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <Dialog open={isTargetsModalOpen} onOpenChange={setIsTargetsModalOpen}>
@@ -178,7 +241,6 @@ import { Calculator, TrendingUp, PieChart, Building2, PoundSterling, Home, Targe
                     type="number"
                     value={targets.totalValue.toString()}
                     onChange={(e) => handleTargetChange('totalValue', e.target.value)}
-                    className="bg-navy-800 border-gold-500/20 text-black"
                   />
                 </div>
                 <div>
@@ -187,7 +249,6 @@ import { Calculator, TrendingUp, PieChart, Building2, PoundSterling, Home, Targe
                     type="number"
                     value={targets.monthlyRevenue.toString()}
                     onChange={(e) => handleTargetChange('monthlyRevenue', e.target.value)}
-                    className="bg-navy-800 border-gold-500/20 text-black"
                   />
                 </div>
                 <div>
@@ -196,7 +257,6 @@ import { Calculator, TrendingUp, PieChart, Building2, PoundSterling, Home, Targe
                     type="number"
                     value={targets.averageYield.toString()}
                     onChange={(e) => handleTargetChange('averageYield', e.target.value)}
-                    className="bg-navy-800 border-gold-500/20 text-black"
                   />
                 </div>
                 <div>
@@ -205,7 +265,6 @@ import { Calculator, TrendingUp, PieChart, Building2, PoundSterling, Home, Targe
                     type="number"
                     value={targets.predictedGrowth.toString()}
                     onChange={(e) => handleTargetChange('predictedGrowth', e.target.value)}
-                    className="bg-navy-800 border-gold-500/20 text-black"
                   />
                 </div>
                 <div>
@@ -214,7 +273,6 @@ import { Calculator, TrendingUp, PieChart, Building2, PoundSterling, Home, Targe
                     type="number"
                     value={targets.totalProperties.toString()}
                     onChange={(e) => handleTargetChange('totalProperties', e.target.value)}
-                    className="bg-navy-800 border-gold-500/20 text-black"
                   />
                 </div>
               </div>

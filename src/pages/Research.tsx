@@ -1,7 +1,6 @@
 import { PropertyHero } from '@/components/PropertyHero';
 import { Card } from '@/components/ui/card';
-import { FileText, Download, TrendingUp } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { FileText } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const RESEARCH_REPORTS = [
@@ -101,16 +100,6 @@ export function Research() {
                   </div>
                   <h3 className="text-xl font-semibold text-white mb-4">{report.title}</h3>
                   <p className="text-gray-400 mb-6">{report.description}</p>
-                  <div className="flex gap-4">
-                    <Button className="flex-1 bg-gold-500 text-navy-950 hover:bg-gold-600">
-                      <Download className="w-4 h-4 mr-2" />
-                      Download
-                    </Button>
-                    <Button variant="outline" className="flex-1 border-gold-500/20">
-                      <TrendingUp className="w-4 h-4 mr-2" />
-                      View Stats
-                    </Button>
-                  </div>
                 </div>
               </Card>
             </Link>

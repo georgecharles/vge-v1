@@ -1,63 +1,77 @@
-import { useState } from 'react';
-import { PropertyHero } from '@/components/PropertyHero';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MarketWidget } from '@/components/MarketWidget';
 import { PortfolioStats } from '@/components/PortfolioStats';
 import { useAuth } from '@/lib/context/auth';
-import { Bell, Camera, Settings, Star, Newspaper, CreditCard, ChevronRight } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Bell, Camera, Star, Newspaper, ChevronRight, Lightbulb } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { generateMockProperties } from '@/lib/mockData';
+import PropertyCard from '@/components/PropertyCard';
+import type { Property } from '@/lib/types';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+
+interface ScrapedProperty {
+  title: string;
+  address: string;
+  price: string;
+  link: string;
+  image: string;
+}
 
 export function Account() {
-  const { user } = useAuth();
+  const { user, unsaveProperty } = useAuth();
   const navigate = useNavigate();
-  const [bannerImage, setBannerImage] = useState('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab');
-  const [formData, setFormData] = useState({
+  const [bannerImage] = useState<string | null>(null);
+  const [] = useState({
     email: user?.email || '',
     firstName: user?.firstName || '',
     lastName: user?.lastName || '',
     priceAlert: '0',
     marketKeywords: ''
   });
+  const [savedProperties, setSavedProperties] = useState<Property[]>([]);
+  const [isTipsModalOpen, setIsTipsModalOpen] = useState(false);
+  const [selectedProperties] = useState<string[]>([]);
+  const [importedProperties, setImportedProperties] = useState<ScrapedProperty[]>(() => {
+    const saved = localStorage.getItem('imported_properties');
+    return saved ? JSON.parse(saved) : [];
+  });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  const handlePropertyRemove = (propertyId: string) => {
+    if (user) {
+      unsaveProperty(propertyId);
+      const updatedProperties = savedProperties.filter(p => p.id.toString() !== propertyId);
+      setSavedProperties(updatedProperties);
+    }
   };
 
-  const [favoriteWidgets] = useState([
+
+  useEffect(() => {
+    const loadSavedProperties = async () => {
+      if (user?.savedProperties) {
+        const allProperties = await generateMockProperties(20);
+        const userSaved = allProperties.filter(p => 
+          user.savedProperties.includes(p.id.toString())
+        );
+        setSavedProperties(userSaved);
+      }
+    };
+    loadSavedProperties();
+  }, [user?.savedProperties]);
+
+  const favoriteWidgets = [
     { id: 'interest-rates', title: 'Interest Rate Forecast' },
     { id: 'price-trends', title: 'Price Trends' },
     { id: 'market-activity', title: 'Market Activity' }
-  ]);
+  ];
 
-  const [alerts] = useState([
-    {
-      id: 1,
-      type: 'price',
-      message: 'Property prices in Manchester have increased by 5.2%',
-      date: '2 hours ago'
-    },
-    {
-      id: 2,
-      type: 'interest',
-      message: 'Interest rates expected to decrease in Q2 2024',
-      date: '1 day ago'
-    },
-    {
-      id: 3,
-      type: 'market',
-      message: 'New investment opportunity in Leeds detected',
-      date: '2 days ago'
-    }
-  ]);
+  const alerts = [
+    { id: 1, type: 'price', message: 'Property prices in Manchester have increased by 5.2%', date: '2 hours ago' },
+    { id: 2, type: 'interest', message: 'Interest rates expected to decrease in Q2 2024', date: '1 day ago' },
+    { id: 3, type: 'market', message: 'New investment opportunity in Leeds detected', date: '2 days ago' }
+  ];
 
-  const [news] = useState([
+  const news = [
     {
       id: 1,
       image: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa',
@@ -82,13 +96,22 @@ export function Account() {
       category: 'Investment',
       aiSummary: 'Data analysis reveals emerging opportunities in Manchester, Leeds, and Newcastle, driven by infrastructure investments and growing tech sectors.'
     }
-  ]);
+  ];
+
+
+  const handleOpenTipsModal = () => {
+    setIsTipsModalOpen(true);
+  };
+
+  const handleCloseTipsModal = () => {
+    setIsTipsModalOpen(false);
+  };
 
   return (
-    <div>
+    <>
       <div className="relative h-48 bg-navy-950">
         <img
-          src={bannerImage}
+          src={bannerImage || "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab"}
           alt="Profile Banner"
           className="w-full h-full object-cover opacity-30"
         />
@@ -132,8 +155,6 @@ export function Account() {
 
           <TabsContent value="dashboard">
             <div className="grid gap-6">
-              <PortfolioStats />
-
               <div className="grid md:grid-cols-2 gap-6">
                 {/* Favorite Widgets */}
                 <div className="bg-navy-800/30 backdrop-blur-md rounded-xl p-6 border border-gold-500/10">
@@ -185,6 +206,59 @@ export function Account() {
                 </div>
               </div>
 
+              <PortfolioStats selectedProperties={selectedProperties} />
+
+              {/* Saved Properties Grid */}
+              {savedProperties.length > 0 && (
+                <div className="mt-8">
+                  <h2 className="text-2xl font-light text-white mb-4">Your Portfolio</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
+                    {savedProperties.map((property) => (
+                      <PropertyCard 
+                        key={property.id} 
+                        {...property} 
+                        showDeleteButton={true}
+                        onDelete={() => handlePropertyRemove(property.id.toString())} 
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Imported Properties Grid */}
+              {importedProperties.length > 0 && (
+                <div className="mt-8">
+                  <h2 className="text-2xl font-light text-white mb-4">Imported Properties</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
+                    {importedProperties.map((listing, index) => (
+                      <div
+                        key={index}
+                        className="glass-card rounded-lg overflow-hidden group hover:scale-[1.02] transition-all duration-300 relative bg-black-800/50"
+                      >
+                        <div className="relative">
+                          <img
+                            src={listing.image}
+                            alt={listing.title}
+                            className="w-full aspect-[4/3] object-cover transition-transform duration-300 group-hover:scale-105"
+                          />
+                        </div>
+                        <div className="p-6">
+                          <div className="flex justify-between items-start mb-4">
+                            <div>
+                              <h3 className="text-xl font-semibold text-white mb-2">{listing.title}</h3>
+                              <p className="text-gray-400">{listing.address}</p>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-xl font-bold text-white">{listing.price}</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Latest News */}
               <div className="bg-navy-800/30 backdrop-blur-md rounded-xl p-6 border border-gold-500/10">
                 <div className="flex items-center justify-between mb-6">
@@ -222,136 +296,93 @@ export function Account() {
                   ))}
                 </div>
               </div>
-            </div>
-          </TabsContent>
 
-          <TabsContent value="favorites">
-            <div className="bg-navy-800/30 backdrop-blur-md rounded-xl p-6 border border-gold-500/10">
-              <h2 className="text-xl font-light text-white mb-6">Favorite Widgets</h2>
-              <div className="grid md:grid-cols-2 gap-6">
-                {favoriteWidgets.map(widget => (
-                  <MarketWidget key={widget.id} id={widget.id} title={widget.title}>
-                    <div className="p-6 text-center text-gray-400">
-                      Widget content here
-                    </div>
-                  </MarketWidget>
-                ))}
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="alerts">
-            <div className="bg-navy-800/30 backdrop-blur-md rounded-xl p-6 border border-gold-500/10">
-              <h2 className="text-xl font-light text-white mb-6">Alert Settings</h2>
-              <div className="space-y-6">
-                <div>
-                  <Label>Price Alerts</Label>
-                  <Input
-                    type="number"
-                    min="0"
-                    step="1000"
-                    placeholder="Enter price threshold"
-                    className="bg-navy-900 border-gold-500/20"
-                    value={formData.priceAlert}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      priceAlert: e.target.value || '0'
-                    }))}
-                  />
-                </div>
-                <div>
-                  <Label>Market Updates</Label>
-                  <Input
-                    name="marketKeywords"
-                    type="text"
-                    placeholder="Enter keywords"
-                    className="bg-navy-900 border-gold-500/20"
-                    value={formData.marketKeywords}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="subscription">
-            <div className="bg-navy-800/30 backdrop-blur-md rounded-xl p-6 border border-gold-500/10">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h2 className="text-xl font-light text-white">Current Plan</h2>
-                  <p className="text-gray-400">Premium Investor</p>
-                </div>
-                <Button asChild className="bg-emerald-500 hover:bg-emerald-600">
-                  <Link to="/subscription">Upgrade Plan</Link>
-                </Button>
-              </div>
-              <div className="grid md:grid-cols-3 gap-6">
-                <div className="p-4 bg-navy-900/50 rounded-lg">
-                  <div className="text-sm text-gray-400 mb-1">API Usage</div>
-                  <div className="text-2xl font-light text-white">2,450 / 5,000</div>
-                  <div className="text-sm text-gray-400">API calls this month</div>
-                </div>
-                <div className="p-4 bg-navy-900/50 rounded-lg">
-                  <div className="text-sm text-gray-400 mb-1">Storage</div>
-                  <div className="text-2xl font-light text-white">4.2 GB / 10 GB</div>
-                  <div className="text-sm text-gray-400">Storage used</div>
-                </div>
-                <div className="p-4 bg-navy-900/50 rounded-lg">
-                  <div className="text-sm text-gray-400 mb-1">Next Billing</div>
-                  <div className="text-2xl font-light text-white">March 15, 2024</div>
-                  <div className="text-sm text-gray-400">£29.99/month</div>
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="settings">
-            <div className="bg-navy-800/30 backdrop-blur-md rounded-xl p-6 border border-gold-500/10">
-              <h2 className="text-xl font-light text-white mb-6">Account Settings</h2>
-              <div className="space-y-6">
-                <div>
-                  <Label>Email</Label>
-                  <Input
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className="bg-navy-900 border-gold-500/20"
-                  />
-                </div>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <Label>First Name</Label>
-                    <Input
-                      name="firstName"
-                      type="text"
-                      value={formData.firstName}
-                      onChange={handleInputChange}
-                      className="bg-navy-900 border-gold-500/20"
-                    />
+              {/* HMRC's Tax Bands and Allowances */}
+              <div className="bg-navy-800/30 backdrop-blur-md rounded-xl p-6 border border-gold-500/10">
+                <h2 className="text-xl font-light text-white mb-6">HMRC's Tax Bands and Allowances</h2>
+                <div className="space-y-4">
+                  <div className="p-4 bg-navy-900/30 rounded-lg border border-gold-500/5">
+                    <h3 className="text-lg text-white mb-2">Income Tax Bands</h3>
+                    <p className="text-gray-400">Basic Rate: 20% on income up to £50,270</p>
+                    <p className="text-gray-400">Higher Rate: 40% on income between £50,271 and £150,000</p>
+                    <p className="text-gray-400">Additional Rate: 45% on income over £150,000</p>
                   </div>
-                  <div>
-                    <Label>Last Name</Label>
-                    <Input
-                      name="lastName"
-                      type="text"
-                      value={formData.lastName}
-                      onChange={handleInputChange}
-                      className="bg-navy-900 border-gold-500/20"
-                    />
+                  <div className="p-4 bg-navy-900/30 rounded-lg border border-gold-500/5">
+                    <h3 className="text-lg text-white mb-2">Capital Gains Tax Allowances</h3>
+                    <p className="text-gray-400">Annual Exempt Amount: £12,300</p>
+                    <p className="text-gray-400">Basic Rate: 18% on gains within the basic income tax band</p>
+                    <p className="text-gray-400">Higher Rate: 28% on gains above the basic income tax band</p>
+                  </div>
+                  <div className="p-4 bg-navy-900/30 rounded-lg border border-gold-500/5">
+                    <h3 className="text-lg text-white mb-2">Stamp Duty Land Tax (SDLT)</h3>
+                    <p className="text-gray-400">0% on properties up to £125,000</p>
+                    <p className="text-gray-400">2% on properties between £125,001 and £250,000</p>
+                    <p className="text-gray-400">5% on properties between £250,001 and £925,000</p>
+                    <p className="text-gray-400">10% on properties between £925,001 and £1.5 million</p>
+                    <p className="text-gray-400">12% on properties over £1.5 million</p>
                   </div>
                 </div>
-                <div className="flex justify-end">
-                  <Button className="bg-gold-500 text-navy-950 hover:bg-gold-600">
-                    <Settings className="w-4 h-4 mr-2" />
-                    Save Changes
-                  </Button>
+              </div>
+
+              {/* Regulatory Alerts */}
+              <div className="bg-navy-800/30 backdrop-blur-md rounded-xl p-6 border border-gold-500/10">
+                <h2 className="text-xl font-light text-white mb-6">Regulatory Alerts</h2>
+                <div className="space-y-4">
+                  <div className="p-4 bg-navy-900/30 rounded-lg border border-gold-500/5">
+                    <h3 className="text-lg text-white mb-2">EPC Requirements</h3>
+                    <p className="text-gray-400">All rental properties must have an Energy Performance Certificate (EPC) rating of E or above.</p>
+                    <p className="text-gray-400">From 2025, new tenancies will require an EPC rating of C or above.</p>
+                    <p className="text-gray-400">From 2028, all existing tenancies will require an EPC rating of C or above.</p>
+                  </div>
+                  <div className="p-4 bg-navy-900/30 rounded-lg border border-gold-500/5">
+                    <h3 className="text-lg text-white mb-2">Section 24 Updates</h3>
+                    <p className="text-gray-400">Mortgage interest relief is now restricted to the basic rate of income tax (20%).</p>
+                    <p className="text-gray-400">Landlords can no longer deduct mortgage expenses from rental income to reduce tax bills.</p>
+                  </div>
                 </div>
               </div>
             </div>
           </TabsContent>
+
+          {/* ... other TabsContent components ... */}
         </Tabs>
+        <div className="flex justify-center mt-8">
+          <Button onClick={handleOpenTipsModal} className="bg-gold-500 text-navy-950 hover:bg-gold-600">
+            <Lightbulb className="w-4 h-4 mr-2" />
+            Tips on Investing
+          </Button>
+        </div>
       </div>
-    </div>
+
+      <Dialog open={isTipsModalOpen} onOpenChange={handleCloseTipsModal}>
+        <DialogContent className="max-w-3xl bg-navy-900 border-gold-500/20">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-light text-white">Tips on Investing</DialogTitle>
+          </DialogHeader>
+          <div className="p-6 space-y-4">
+            <h4 className="text-lg font-light text-white">Serviced Accommodation</h4>
+            <p className="text-gray-400">
+              Consider properties suitable for short-term rentals. Focus on locations with high tourist demand and amenities that attract travelers.
+            </p>
+            <h4 className="text-lg font-light text-white">Rent-to-Rent</h4>
+            <p className="text-gray-400">
+              Explore opportunities to rent properties and sublet them for a higher price. This strategy requires careful management and market analysis.
+            </p>
+            <h4 className="text-lg font-light text-white">BRRR Strategy</h4>
+            <p className="text-gray-400">
+              Buy properties that need renovation, refurbish them, refinance to pull out capital, and then rent them out. This strategy can create value and generate cash flow.
+            </p>
+            <h4 className="text-lg font-light text-white">HMOs</h4>
+            <p className="text-gray-400">
+              Look for properties that can be converted into Houses in Multiple Occupation (HMOs) to maximize rental income. Ensure compliance with local regulations.
+            </p>
+            <h4 className="text-lg font-light text-white">Location, Location, Location</h4>
+            <p className="text-gray-400">
+              Always prioritize locations with strong economic growth, good transport links, and high demand for rental properties.
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

@@ -3,9 +3,9 @@ import { PropertyHero } from '@/components/PropertyHero';
 import { PropertyFilters, type PropertyFilters as Filters } from '@/components/PropertyFilters';
 import { PropertySort } from '@/components/PropertySort';
 import PropertyCard from '@/components/PropertyCard';
-import { generateMockProperties } from '@/lib/mockData';
 import type { Property } from '@/lib/types';
 import { motion } from 'framer-motion';
+import { supabase } from '@/lib/supabaseClient';
 
 export function Properties() {
   const [sortBy, setSortBy] = useState('price_asc');
@@ -83,10 +83,24 @@ export function Properties() {
   useEffect(() => {
     const loadProperties = async () => {
       setIsLoading(true);
-      const mockProperties = await generateMockProperties(20);
-      setProperties(mockProperties);
-      applyFilters(mockProperties, filters);
-      setIsLoading(false);
+      try {
+        const { data, error } = await supabase
+          .from('featured_properties')
+          .select('*');
+
+        if (error) {
+          console.error('Error fetching featured properties:', error);
+          setProperties([]);
+        } else {
+          setProperties(data as Property[]);
+          applyFilters(data as Property[], filters);
+        }
+      } catch (error) {
+        console.error('Error fetching featured properties:', error);
+        setProperties([]);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     loadProperties();
