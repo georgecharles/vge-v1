@@ -1,214 +1,326 @@
-import { useState } from 'react';
-    import { Menu, X, Home, Building2, TrendingUp, HelpCircle, LogIn, UserCircle, LogOut, Calculator, FileText, BookOpen, Diamond, ShieldCheck } from 'lucide-react';
-    import { Button } from '@/components/ui/button';
-    import { useAuth } from '@/lib/context/auth';
-    import { Link } from 'react-router-dom';
-    import {
-      DropdownMenu,
-      DropdownMenuContent,
-      DropdownMenuItem,
-      DropdownMenuTrigger,
-    } from "@/components/ui/dropdown-menu";
-    import { AccountModal } from './auth/AccountModal';
-    import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import React from "react";
+import { Button } from "./ui/button";
+import { Menu } from "lucide-react";
+import { MobileNav } from "./MobileNav";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "./ui/navigation-menu";
+import { cn } from "../lib/utils";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../lib/auth";
+import {
+  Building2,
+  LogIn,
+  UserPlus,
+  LogOut,
+  Settings,
+  LayoutDashboard,
+  Crown,
+} from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 
-    export function Header({ onAuthClick }: { onAuthClick: () => void }) {
-      const [isMenuOpen, setIsMenuOpen] = useState(false);
-      const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
-      const { user, logout } = useAuth();
+interface HeaderProps {
+  isAuthenticated?: boolean;
+  onSignIn?: () => void;
+  onSignUp?: () => void;
+  userProfile?: {
+    full_name?: string;
+    email?: string;
+  };
+}
 
-      return (
-        <header className="fixed w-full z-50 py-4">
-          {/* Gaussian blur background */}
-          <div className="absolute inset-0 bg-navy-950/60 backdrop-blur-xl" />
-          
-          <div className="relative max-w-7xl mx-auto px-4">
-            <div className="flex items-center justify-between">
-              {/* Logo */}
-              <Link to="/" className="flex items-center gap-2 group">
-                <span className="text-2xl font-bold text-white tracking-tight">MyVGE</span>
-              </Link>
+const Header = ({
+  isAuthenticated = false,
+  onSignIn,
+  onSignUp,
+  userProfile = {},
+}: HeaderProps) => {
+  const [showMobileMenu, setShowMobileMenu] = React.useState(false);
+  const navigate = useNavigate();
+  const { signOut } = useAuth();
 
-              {/* Navigation */}
-              <nav className="hidden md:flex items-center gap-8">
-                <Link to="/" className="text-white/80 hover:text-gold-400 flex items-center gap-2 font-light transition-colors">
-                  <Home className="h-4 w-4" />
-                  Home
-                </Link>
-                <Link to="/properties" className="text-white/80 hover:text-gold-400 flex items-center gap-2 font-light transition-colors">
-                  <Building2 className="h-4 w-4" />
-                  Properties
-                </Link>
-                <Link to="/market-insights" className="text-white/80 hover:text-gold-400 flex items-center gap-2 font-light transition-colors">
-                  <TrendingUp className="h-4 w-4" />
-                  Market Insights
-                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-gold-500 transform scale-x-0 transition-transform origin-left group-hover:scale-x-100" />
-                </Link>
-                <Link to="/calculators" className="text-white/80 hover:text-gold-400 flex items-center gap-2 font-light transition-colors">
-                  <Calculator className="h-4 w-4" />
-                  Calculators
-                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-gold-500 transform scale-x-0 transition-transform origin-left group-hover:scale-x-100" />
-                </Link>
-                <Link to="/research" className="text-white/80 hover:text-gold-400 flex items-center gap-2 font-light transition-colors">
-                  <FileText className="h-4 w-4" />
-                  Research
-                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-gold-500 transform scale-x-0 transition-transform origin-left group-hover:scale-x-100" />
-                </Link>
-                <Link to="/blog" className="text-white/80 hover:text-gold-400 flex items-center gap-2 font-light transition-colors">
-                  <BookOpen className="h-4 w-4" />
-                  Blog
-                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-gold-500 transform scale-x-0 transition-transform origin-left group-hover:scale-x-100" />
-                </Link>
-                <Link to="/help" className="text-white/80 hover:text-gold-400 flex items-center gap-2 font-light transition-colors">
-                  <HelpCircle className="h-4 w-4" />
-                  Help
-                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-gold-500 transform scale-x-0 transition-transform origin-left group-hover:scale-x-100" />
-                </Link>
-              </nav>
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
 
-              {/* Auth Section */}
-              <div className="hidden md:flex items-center gap-4">
-                <Link to="/subscription" className="text-gold-400 hover:text-gold-500 flex items-center gap-2 font-light transition-colors whitespace-nowrap">
-                  <Diamond className="w-4 h-4" />
-                  {user ? 'Upgrade' : 'Join Investors'}
-                </Link>
-                {user ? (
-                  <>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="text-white font-light">
-                          <Avatar className="mr-2">
-                            <AvatarFallback style={{ backgroundColor: 'black', color: 'white' }}>{user.firstName.charAt(0)}</AvatarFallback>
-                          </Avatar>
-                          {user.firstName}
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="bg-navy-800/95 backdrop-blur-md border-gold-500/20">
-                        <DropdownMenuItem asChild className="text-white hover:text-white hover:bg-navy-700">
-                          <Link to="/account">
-                            <UserCircle className="h-4 w-4 mr-2 text-white" />
-                            My Dashboard
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setIsAccountModalOpen(true)} className="text-white hover:text-white hover:bg-navy-700">
-                          <UserCircle className="h-4 w-4 mr-2 text-white" />
-                          Manage Account
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={logout} className="text-white hover:text-white hover:bg-navy-700">
-                          <LogOut className="h-4 w-4 mr-2 text-white" />
-                          Logout
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </>
-                ) : (
-                  <>
-                    <Button variant="ghost" className="text-white hover:text-gold-400 font-light transition-colors" onClick={onAuthClick}>
-                      Sign In
-                    </Button>
-                    <Button
-                      asChild
-                      className="bg-emerald-500 text-white hover:bg-emerald-600 font-light transition-all duration-300"
-                    >
-                      <Link to="/subscription">Join Investors</Link>
-                    </Button>
-                  </>
-                )}
-              </div>
+  const ListItem = React.forwardRef<
+    React.ElementRef<"a">,
+    React.ComponentPropsWithoutRef<"a"> & {
+      title: string;
+    }
+  >(({ className, title, children, ...props }, ref) => {
+    return (
+      <li>
+        <NavigationMenuLink asChild>
+          <a
+            ref={ref}
+            className={cn(
+              "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+              className,
+            )}
+            {...props}
+          >
+            <div className="text-sm font-medium leading-none">{title}</div>
+            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+              {children}
+            </p>
+          </a>
+        </NavigationMenuLink>
+      </li>
+    );
+  });
+  ListItem.displayName = "ListItem";
 
-              {/* Mobile Menu Button */}
-              <button
-                className="md:hidden text-white hover:text-gold-400 transition-colors"
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-              >
-                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-              </button>
+  return (
+    <>
+      <header className="fixed top-0 left-0 right-0 z-50 px-4 py-2">
+        <div className="mx-auto max-w-[1400px] rounded-full backdrop-blur-md bg-background/80 border border-border/50 shadow-lg transition-all duration-300">
+          <div className="container mx-auto h-14 px-6 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <a href="/" className="hover:opacity-80 transition-opacity">
+                <img
+                  src="https://i.postimg.cc/1zhYWbNc/my-1-1.png"
+                  alt="MyVGE"
+                  className="h-8"
+                />
+              </a>
             </div>
 
-            {/* Mobile Menu */}
-            {isMenuOpen && (
-              <div className="md:hidden py-4 relative mt-4">
-                <nav className="flex flex-col gap-4">
-                  <Link to="/subscription" className="text-gold-400 hover:text-gold-500 flex items-center gap-2 font-light transition-colors">
-                    <img 
-                      src="https://static.vecteezy.com/system/resources/thumbnails/008/513/899/small_2x/blue-diamond-illustration-png.png"
-                      alt="Diamond" 
-                      className="w-4 h-4"
-                    />
-                    {user ? 'Upgrade' : 'Join Investors'}
-                  </Link>
-                  <Link to="/" className="text-white/80 hover:text-gold-400 flex items-center gap-2 font-light transition-colors">
-                    <Home className="h-4 w-4" />
-                    Home
-                  </Link>
-                  <Link to="/properties" className="text-white/80 hover:text-gold-400 flex items-center gap-2 font-light transition-colors">
-                    <Building2 className="h-4 w-4" />
-                    Properties
-                  </Link>
-                  <Link to="/market-insights" className="text-white/80 hover:text-gold-400 flex items-center gap-2 font-light transition-colors">
-                    <TrendingUp className="h-4 w-4" />
-                    Market Insights
-                  </Link>
-                  <Link to="/calculators" className="text-white/80 hover:text-gold-400 flex items-center gap-2 font-light transition-colors">
-                    <Calculator className="h-4 w-4" />
-                    Calculators
-                  </Link>
-                  <Link to="/research" className="text-white/80 hover:text-gold-400 flex items-center gap-2 font-light transition-colors">
-                    <FileText className="h-4 w-4" />
-                    Research
-                  </Link>
-                  <Link to="/blog" className="text-white/80 hover:text-gold-400 flex items-center gap-2 font-light transition-colors">
-                    <BookOpen className="h-4 w-4" />
-                    Blog
-                  </Link>
-                  <Link to="/help" className="text-white/80 hover:text-gold-400 flex items-center gap-2 font-light transition-colors">
-                    <HelpCircle className="h-4 w-4" />
-                    Help
-                  </Link>
-                  {user ? (
-                    <div className="flex flex-col gap-2 pt-4 border-t border-gold-500/20">
-                      <Button variant="ghost" className="text-white justify-start font-light" onClick={() => setIsAccountModalOpen(true)}>
-                        <img 
-                          src="https://i.postimg.cc/j216481G/avatar.png"
-                          alt={user.firstName}
-                          className="w-8 h-8 rounded-full object-cover mr-2"
-                        />
-                        Manage Account
-                      </Button>
-                      {user.role === 'admin' && (
-                        <Link to="/admin" className="text-white/80 hover:text-gold-400 flex items-center gap-2 font-light transition-colors">
-                          <ShieldCheck className="h-4 w-4" />
-                          Admin Panel
-                        </Link>
-                      )}
-                      <Button variant="ghost" className="text-white justify-start font-light" onClick={logout}>
-                        <LogOut className="h-4 w-4 mr-2" />
-                        Logout
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col gap-2 pt-4 border-t border-gold-500/20">
-                      <Button variant="ghost" className="text-white hover:text-gold-400 justify-start font-light transition-colors" onClick={onAuthClick}>
-                        <LogIn className="h-4 w-4 mr-2" />
-                        Sign In
-                      </Button>
-                      <Button
-                        asChild
-                        className="bg-emerald-500 text-white hover:bg-emerald-600 font-light transition-all duration-300"
-                      >
-                        <Link to="/subscription">Join Investors</Link>
-                      </Button>
-                    </div>
-                  )}
-                </nav>
-              </div>
-            )}
-          </div>
+            <NavigationMenu className="hidden lg:flex">
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className="text-sm font-medium transition-colors hover:text-primary bg-transparent hover:bg-transparent">
+                    Market
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid w-[400px] gap-3 p-4 rounded-xl">
+                      <ListItem href="/trends" title="Market Trends">
+                        Stay updated with the latest real estate market trends.
+                      </ListItem>
+                      <ListItem href="/insights" title="Market Insights">
+                        Deep dive into property market analytics and forecasts.
+                      </ListItem>
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
 
-          <AccountModal
-            isOpen={isAccountModalOpen}
-            onClose={() => setIsAccountModalOpen(false)}
-          />
-        </header>
-      );
-    }
+                <NavigationMenuItem>
+                  <NavigationMenuLink
+                    className="text-sm font-medium transition-colors hover:text-primary px-4 py-2"
+                    href="/deals"
+                  >
+                    Deals
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+
+                <NavigationMenuItem>
+                  <NavigationMenuLink
+                    className="text-sm font-medium transition-colors hover:text-primary px-4 py-2"
+                    href="/calculators"
+                  >
+                    Calculators
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuLink
+                    className="text-sm font-medium transition-colors hover:text-primary px-4 py-2"
+                    href="/pricing"
+                  >
+                    Pricing
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuLink
+                    className="text-sm font-medium transition-colors hover:text-primary px-4 py-2"
+                    href="/help"
+                  >
+                    Help & Support
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                className="lg:hidden p-2"
+                onClick={() => setShowMobileMenu(true)}
+              >
+                <Menu className="h-6 w-6" />
+              </Button>
+              <Button
+                variant="ghost"
+                className="hidden md:flex bg-gradient-to-r from-emerald-400 to-cyan-400 text-white hover:from-emerald-500 hover:to-cyan-500 border border-emerald-500/20 shadow-lg hover:shadow-emerald-500/20 transition-all duration-300"
+                onClick={() => (window.location.href = "/pricing")}
+              >
+                <Crown className="mr-2 h-4 w-4" />
+                Upgrade
+              </Button>
+              {!isAuthenticated ? (
+                <div className="hidden md:flex items-center gap-4">
+                  <Button variant="ghost" onClick={() => onSignIn?.()}>
+                    <LogIn className="mr-2 h-4 w-4" />
+                    Sign In
+                  </Button>
+                  <Button onClick={() => onSignUp?.()} variant="default">
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    Sign Up
+                  </Button>
+                </div>
+              ) : (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="relative h-10 w-10 rounded-full"
+                    >
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage
+                          src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${userProfile?.email}`}
+                          alt={userProfile?.full_name || "User avatar"}
+                        />
+                        <AvatarFallback className="bg-primary/10">
+                          {userProfile?.full_name
+                            ?.split(" ")
+                            .filter(Boolean)
+                            .map((n) => n[0])
+                            .slice(0, 2)
+                            .join("")
+                            .toUpperCase() || "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                    <DropdownMenuItem className="flex-col items-start">
+                      <div className="font-medium">
+                        {userProfile?.full_name}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {userProfile?.email}
+                      </div>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() =>
+                        window.location.pathname !== "/dashboard" &&
+                        navigate("/dashboard")
+                      }
+                    >
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      <span>Dashboard</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate("/account")}>
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Account Settings</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleSignOut}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log Out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <MobileNav
+        isOpen={showMobileMenu}
+        onClose={() => setShowMobileMenu(false)}
+      >
+        <nav className="space-y-6">
+          <a
+            href="/deals"
+            className="block text-lg font-medium hover:text-primary transition-colors"
+          >
+            Investment Deals
+          </a>
+          <div className="space-y-3">
+            <h4 className="text-sm font-medium text-muted-foreground">
+              Resources
+            </h4>
+            <div className="space-y-3 pl-1">
+              <a
+                href="/trends"
+                className="block text-lg font-medium hover:text-primary transition-colors"
+              >
+                Market Trends
+              </a>
+              <a
+                href="/insights"
+                className="block text-lg font-medium hover:text-primary transition-colors"
+              >
+                Market Insights
+              </a>
+              <a
+                href="/research"
+                className="block text-lg font-medium hover:text-primary transition-colors"
+              >
+                Research & Reports
+              </a>
+              <a
+                href="/blog"
+                className="block text-lg font-medium hover:text-primary transition-colors"
+              >
+                Blog
+              </a>
+            </div>
+          </div>
+          <a
+            href="/calculators"
+            className="block text-lg font-medium hover:text-primary transition-colors"
+          >
+            Calculators
+          </a>
+          <a
+            href="/pricing"
+            className="block text-lg font-medium hover:text-primary transition-colors"
+          >
+            Pricing
+          </a>
+          {!isAuthenticated ? (
+            <div className="space-y-4 pt-6">
+              <Button
+                variant="ghost"
+                className="w-full justify-start"
+                onClick={() => onSignIn?.()}
+              >
+                <LogIn className="mr-2 h-4 w-4" />
+                Sign In
+              </Button>
+              <Button
+                className="w-full justify-start"
+                onClick={() => onSignUp?.()}
+              >
+                <UserPlus className="mr-2 h-4 w-4" />
+                Sign Up
+              </Button>
+            </div>
+          ) : null}
+        </nav>
+      </MobileNav>
+    </>
+  );
+};
+
+export default Header;

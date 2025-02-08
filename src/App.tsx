@@ -1,170 +1,125 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-    import { useState } from 'react';
-    import { AnimatePresence, motion } from 'framer-motion';
-    import { Header } from '@/components/Header';
-    import { Footer } from '@/components/Footer';
-    import { AuthModal } from '@/components/auth/AuthModal';
-    import { Breadcrumbs } from '@/components/Breadcrumbs';
-    import { AuthProvider, useAuth } from '@/lib/context/auth';
-    import { LocationProvider } from '@/lib/context/location';
-    import { ScrollToTop } from '@/components/ScrollToTop';
-    import { Home } from '@/pages/Home';
-    import { Properties } from '@/pages/Properties';
-    import { PropertyDetails } from '@/pages/PropertyDetails';
-    import { MarketInsights } from '@/pages/MarketInsights';
-    import { PropertyCalculators } from '@/pages/PropertyCalculators';
-    import { Research } from '@/pages/Research';
-    import { ResearchPost } from '@/pages/ResearchPost';
-    import { Blog } from '@/pages/Blog';
-    import { Account } from '@/pages/Account';
-    import { BlogPost } from '@/pages/BlogPost';
-    import { Help } from '@/pages/Help';
-    import { About } from '@/pages/About';
-    import { Privacy } from '@/pages/Privacy';
-    import { Terms } from '@/pages/Terms';
-    import { Cookies } from '@/pages/Cookies';
-    import { Investment } from '@/pages/Investment';
-    import { Accessibility } from '@/pages/Accessibility';
-    import { ModernSlavery } from '@/pages/ModernSlavery';
-    import { Complaints } from '@/pages/Complaints';
-    import { Subscription } from '@/pages/Subscription';
-    import { LoginLanding } from '@/pages/LoginLanding';
-    import { Admin } from '@/pages/Admin';
+import { Suspense, useEffect, useState } from "react";
+import { PasswordProtect } from "./components/PasswordProtect";
+import { Loading } from "./components/ui/loading";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  useLocation,
+  useNavigate,
+  useRoutes,
+  Routes,
+  Route,
+} from "react-router-dom";
+import { ProgressBar } from "./components/ui/progress-bar";
+import AuthProvider from "./lib/auth";
+import { Toaster } from "./components/ui/toaster";
+import Home from "./components/home";
+import Dashboard from "./components/Dashboard";
+import PricingPage from "./components/PricingPage";
+import SubscriptionSuccess from "./components/SubscriptionSuccess";
+import SubscriptionCancel from "./components/SubscriptionCancel";
+import AccountSettings from "./components/AccountSettings";
+import { RequireAuth } from "./components/RequireAuth";
+import routes from "tempo-routes";
+import FeaturedProperties from "./components/SearchResults";
+import MarketInsightsPage from "./components/MarketInsightsPage";
+import MarketTrendsPage from "./components/MarketTrendsPage";
+import { ArticlePage } from "./components/ArticlePage";
+import ResearchPage from "./components/ResearchPage";
+import BlogPage from "./components/BlogPage";
+import InvestmentCalculator from "./components/InvestmentCalculator";
+import HelpSupportPage from "./components/HelpSupportPage";
+import React from 'react';
 
-    const pageVariants = {
-      initial: {
-        opacity: 0,
-        y: 20
-      },
-      animate: {
-        opacity: 1,
-        y: 0,
-        transition: {
-          duration: 0.4,
-          ease: "easeOut"
-        }
-      },
-      exit: {
-        opacity: 0,
-        y: -20,
-        transition: {
-          duration: 0.3,
-          ease: "easeIn"
-        }
-      }
-    };
+function AppContent() {
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-    function PrivateRoute({ children }: { children: React.ReactNode }) {
-      const { user, isLoading } = useAuth();
-      const location = useLocation();
-      const showHeaderFooter = location.pathname !== '/login';
+  useEffect(() => {
+    const handleStart = () => setIsLoading(true);
+    const handleStop = () => setIsLoading(false);
 
-      if (isLoading) {
-        return <div>Loading...</div>;
-      }
+    handleStart();
+    const timer = setTimeout(handleStop, 100);
 
-      if (!user) {
-        return <Navigate to="/login" />;
-      }
+    return () => clearTimeout(timer);
+  }, [location.pathname]);
 
-      return (
-        <>
-          {showHeaderFooter && <Header onAuthClick={() => setIsAuthModalOpen(true)} />}
-          {showHeaderFooter && (
-            <div className="max-w-7xl mx-auto px-4 py-4">
-              <Breadcrumbs />
-            </div>
-          )}
-          {children}
-          {showHeaderFooter && <Footer />}
-        </>
-      );
-    }
+  useEffect(() => {
+    document.documentElement.classList.add("dark");
+  }, []);
 
-    function AdminRoute({ children }: { children: React.ReactNode }) {
-      const { user, isLoading } = useAuth();
-    
-      if (isLoading) {
-        return <div>Loading...</div>;
-      }
-    
-      if (!user || user.role !== 'admin') {
-        return <Navigate to="/" />;
-      }
-    
-      return <>{children}</>;
-    }
+  return (
+    <div className="min-h-screen bg-background">
+      {isLoading && <ProgressBar />}
+      <motion.div
+        key={location.pathname}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+      >
+        <Suspense fallback={<Loading />}>
+          <Routes location={location}>
+            <Route path="/" element={<Home />} />
+            <Route path="/deals" element={<FeaturedProperties />} />
+            <Route
+              path="/dashboard"
+              element={
+                <RequireAuth>
+                  <Dashboard />
+                </RequireAuth>
+              }
+            />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route
+              path="/subscription/success"
+              element={<SubscriptionSuccess />}
+            />
+            <Route
+              path="/subscription/cancel"
+              element={<SubscriptionCancel />}
+            />
+            <Route
+              path="/account"
+              element={
+                <RequireAuth>
+                  <AccountSettings />
+                </RequireAuth>
+              }
+            />
+            <Route path="/insights" element={<MarketInsightsPage />} />
+            <Route path="/trends" element={<MarketTrendsPage />} />
+            <Route path="/research" element={<ResearchPage />} />
+            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/article/:title" element={<ArticlePage />} />
+            <Route path="/blog/:slug" element={<ArticlePage />} />
+            <Route path="/calculators" element={<InvestmentCalculator />} />
+            <Route path="/help" element={<HelpSupportPage />} />
+            {import.meta.env.VITE_TEMPO === "true" && (
+              <Route path="/tempobook/*" />
+            )}
+          </Routes>
+        </Suspense>
+      </motion.div>
+      {import.meta.env.VITE_TEMPO === "true" && useRoutes(routes)}
+      <Toaster />
+    </div>
+  );
+}
 
-    function PublicRoute({ children }: { children: React.ReactNode }) {
-      const { user, isLoading } = useAuth();
-    
-      if (isLoading) {
-        return <div>Loading...</div>;
-      }
-    
-      if (user) {
-        return <Navigate to="/" />;
-      }
-    
-      return <>{children}</>;
-    }
+export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = React.useState(() => {
+    return localStorage.getItem("password-protected") === "true";
+  });
 
-    export default function App() {
-      const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  if (!isAuthenticated) {
+    return <PasswordProtect onSuccess={() => setIsAuthenticated(true)} />;
+  }
 
-      return (
-        <AuthProvider>
-          <LocationProvider>
-            <Router>
-              <ScrollToTop />
-              <div className="min-h-screen bg-black-950">
-                
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={window.location.pathname}
-                    initial="initial"
-                    animate="animate"
-                    exit="exit"
-                    variants={pageVariants}
-                  >
-                    <Routes>
-                      <Route path="/login" element={<PublicRoute><LoginLanding /></PublicRoute>} />
-                      <Route path="/" element={<PrivateRoute><Home /></PrivateRoute>} />
-                      <Route path="/properties" element={<PrivateRoute><Properties /></PrivateRoute>} />
-                      <Route path="/property/:id" element={<PrivateRoute><PropertyDetails /></PrivateRoute>} />
-                      <Route path="/market-insights" element={<PrivateRoute><MarketInsights /></PrivateRoute>} />
-                      <Route path="/calculators" element={<PrivateRoute><PropertyCalculators /></PrivateRoute>} />
-                      <Route path="/research" element={<PrivateRoute><Research /></PrivateRoute>} />
-                      <Route path="/research/:id" element={<PrivateRoute><ResearchPost /></PrivateRoute>} />
-                      <Route path="/blog" element={<PrivateRoute><Blog /></PrivateRoute>} />
-                      <Route path="/blog/:id" element={<PrivateRoute><BlogPost /></PrivateRoute>} />
-                      <Route path="/account" element={<PrivateRoute><Account /></PrivateRoute>} />
-                      <Route path="/investment" element={<PrivateRoute><Investment /></PrivateRoute>} />
-                      <Route path="/help" element={<PrivateRoute><Help /></PrivateRoute>} />
-                      <Route path="/about" element={<PrivateRoute><About /></PrivateRoute>} />
-                      <Route path="/privacy" element={<PrivateRoute><Privacy /></PrivateRoute>} />
-                      <Route path="/terms" element={<PrivateRoute><Terms /></PrivateRoute>} />
-                      <Route path="/cookies" element={<PrivateRoute><Cookies /></PrivateRoute>} />
-                      <Route path="/accessibility" element={<PrivateRoute><Accessibility /></PrivateRoute>} />
-                      <Route path="/modern-slavery" element={<PrivateRoute><ModernSlavery /></PrivateRoute>} />
-                      <Route path="/complaints" element={<PrivateRoute><Complaints /></PrivateRoute>} />
-                      <Route path="/subscription" element={<PrivateRoute><Subscription /></PrivateRoute>} />
-                      <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
-                    </Routes>
-                  </motion.div>
-                </AnimatePresence>
-
-                <AuthModal 
-                  isOpen={isAuthModalOpen}
-                  onClose={() => setIsAuthModalOpen(false)}
-                  onSuccess={() => {
-                    setIsAuthModalOpen(false);
-                  }}
-                />
-
-              </div>
-            </Router>
-          </LocationProvider>
-        </AuthProvider>
-      );
-    }
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
+}
